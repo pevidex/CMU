@@ -13,4 +13,14 @@ public class ResponseHandlerImpl implements ResponseHandler {
     public void handle(RegisterResponse rr) {
 
     }
+
+    @Override
+    public void handle(GetLocationsResponse lr) {
+
+    }
+
+    @Override
+    public void handle(GetQuestionsResponse qr) {
+
+    }
 }
