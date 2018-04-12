@@ -5,4 +5,5 @@ import response.Response;
 public interface CommandHandler {
     public Response handle(LoginCommand c);
     public Response handle(RegisterCommand c);
+    public Response handle(GetLocationsCommand c);
 }

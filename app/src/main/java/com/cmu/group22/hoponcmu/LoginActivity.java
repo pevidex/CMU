@@ -20,6 +20,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         Button btLogin = (Button) findViewById(R.id.btLogin);
         TextView btRegister = (TextView) findViewById(R.id.btRegister);
+
+        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        globalContext.getSessionId();
+
+
         btRegister.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent myIntent = new Intent(v.getContext(), RegisterActivity.class);

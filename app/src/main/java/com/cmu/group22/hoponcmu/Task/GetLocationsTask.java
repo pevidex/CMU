@@ -3,22 +3,24 @@ package com.cmu.group22.hoponcmu.Task;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.cmu.group22.hoponcmu.GlobalContext;
-import com.cmu.group22.hoponcmu.LoginActivity;
+import com.cmu.group22.hoponcmu.MainActivity;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 
-import command.LoginCommand;
-import response.LoginResponse;
+import command.GetLocationsCommand;
+import response.GetLocationsResponse;
+import classes.Location;
 
-public class LoginTask extends AsyncTask<String, Void, String> {
+public class GetLocationsTask extends AsyncTask<String, Void, String> {
 
-    private LoginActivity loginActivity;
+    private MainActivity mainActivity;
+    private ArrayList<Location> locations;
 
-    public LoginTask(LoginActivity loginActivity) {
-        this.loginActivity = loginActivity;
+    public GetLocationsTask(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
     }
 
 
@@ -27,22 +29,15 @@ public class LoginTask extends AsyncTask<String, Void, String> {
         Socket server = null;
         String reply = null;
         //ResponseHandlerImpl handler = new ResponseHandlerImpl();
-        LoginCommand lc = new LoginCommand(params[1],params[0]);
+        GetLocationsCommand glc = new GetLocationsCommand();
         try {
             server = new Socket("10.0.2.2", 9090);
             ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
-            oos.writeObject(lc);
+            oos.writeObject(glc);
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
-
-            LoginResponse lr = (LoginResponse) ois.readObject();
-            reply = lr.getMessage();
-            if(lr.getSuccess()) {//change this to use a handler
-                GlobalContext globalContext = (GlobalContext) loginActivity.getApplicationContext();
-                globalContext.setSessionId(lr.getSessionId());
-                Log.d("Set Session ID", Integer.toString(globalContext.getSessionId()));
-                loginActivity.nextActivity();
-            }
-            Log.d("DummyClient",lr.getMessage());
+            GetLocationsResponse lr = (GetLocationsResponse) ois.readObject();
+            this.locations = lr.getLocations();
+            Log.d("DummyClient","Locations received");
             oos.close();
             ois.close();
             Log.d("DummyClient", "Hi there!!");
@@ -61,8 +56,9 @@ public class LoginTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String o) {
-        if (o != null) {
-            loginActivity.updateInterface(o);
+        if (this.locations != null && o!=null) {
+            mainActivity.updateLocations(this.locations);
+            mainActivity.updateInterface(o);
         }
     }
 }
