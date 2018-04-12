@@ -32,17 +32,17 @@
         android:text="Ticket Code" />
 
     <Button
-        android:id="@+id/btLogin"
+        android:id="@+id/btRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:text="Confirm" />
 
     <TextView
-        android:id="@+id/btRegister"
+        android:id="@+id/btLogin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
-        android:text="I already have an account"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:text="I already have an account" />
 </LinearLayout>
