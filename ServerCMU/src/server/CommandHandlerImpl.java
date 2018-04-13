@@ -14,7 +14,6 @@ import response.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Random;
 
 import classes.User;
@@ -26,7 +25,7 @@ public class CommandHandlerImpl implements CommandHandler {
 	ArrayList<User> users;
 	ArrayList<String> available_codes;//codes generated for the users tickets
 	ArrayList<Location> locations;
-	HashMap<String, List<Question>> globalQuestions; 
+	HashMap<String, ArrayList<Question>> globalQuestions; 
 	
 	CommandHandlerImpl(){
 		users=new ArrayList<User>();
@@ -35,7 +34,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		addLocations();
 		addCodes();
 
-		globalQuestions = new HashMap<String, List<Question>>();
+		globalQuestions = new HashMap<String, ArrayList<Question>>();
 		setGlobalQuestions();
 	}
 	
@@ -75,7 +74,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		System.out.println("Received: Questions Command");
 		String location = qc.getLocation();
 
-		List<Question> questions = globalQuestions.get(location);	//Get questions for that location
+		ArrayList<Question> questions = globalQuestions.get(location);	//Get questions for that location
 
 		return new GetQuestionsResponse(questionsToClient(questions));
 	}
@@ -114,7 +113,6 @@ public class CommandHandlerImpl implements CommandHandler {
 
 	@Override
 	public Response handle(GetLocationsCommand c) {
-		System.out.println(locations);
 		return new GetLocationsResponse(locations);
 	}
 
@@ -128,7 +126,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		q1.setAnswer4("Xavier");
 		q1.setCorrectAnswer("Xavier");
 
-		List<Question> questions = new ArrayList<Question>();
+		ArrayList<Question> questions = new ArrayList<Question>();
 		questions.add(q1);
 		questions.add(q1);
 		questions.add(q1);
@@ -137,8 +135,8 @@ public class CommandHandlerImpl implements CommandHandler {
 	}
 
 	//Translate serverQuestions to clientQuestions (without correctAnswer)
-	public List<Question> questionsToClient(List<Question> questions){
-		List<Question> clientQuestions = new ArrayList<Question>();
+	public ArrayList<Question> questionsToClient(ArrayList<Question> questions){
+		ArrayList<Question> clientQuestions = new ArrayList<Question>();
 
 		for (Question q : questions) {
 			Question question = new Question(q.getQuestion(), q.getAnswer1(), q.getAnswer2(), q.getAnswer3(), q.getAnswer4());
