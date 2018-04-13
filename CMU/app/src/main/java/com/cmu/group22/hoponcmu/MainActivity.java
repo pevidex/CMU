@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        new GetLocationsTask(MainActivity.this).execute();
         setContentView(R.layout.activity_main);
 
         Log.d("ATLAS","on create main activity");
@@ -62,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
         img_currentquiz = (ImageView) findViewById(R.id.imageView_currentquiz);
         img_myquizs = (ImageView) findViewById(R.id.imageView_myquizs);
         img_msgbox = (ImageView) findViewById(R.id.imageView_msgbox);
+        listView = (ListView) findViewById(R.id.listView_locationslist);
+
+        //Get Locations From Server
+        new GetLocationsTask(MainActivity.this).execute();
 
         img_currentquiz.setClickable(true);//TODO:according to the detect of wifi to define whether the user can answer now
         img_currentquiz.setOnClickListener(new View.OnClickListener() {
@@ -91,15 +94,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //init the list of locations
-        listView = (ListView) findViewById(R.id.listView_locationslist);
-        listView.setAdapter(new InitLocations(this, locations));
-
         //TODO: maybe there should be some click actions on locations?
 
     }
     public void updateLocations(ArrayList<Location> locations){
         this.locations=locations;
+        //init the list of locations
+        listView.setAdapter(new InitLocations(this, locations));
         Log.d("updateLocations", Integer.toString(locations.size()));
     }
     public void updateInterface(String reply) {
