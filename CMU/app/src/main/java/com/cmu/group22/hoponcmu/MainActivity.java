@@ -2,6 +2,7 @@ package com.cmu.group22.hoponcmu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -14,6 +15,7 @@ import com.cmu.group22.hoponcmu.Task.GetLocationsTask;
 
 import java.util.ArrayList;
 
+import classes.Answers;
 import classes.Location;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView img_currentquiz;
     ImageView img_myquizs;
     ImageView img_msgbox;
+
+    //Answers ans = new Answers();
 
     ArrayList<Location> locations=null;
 
@@ -46,8 +50,9 @@ public class MainActivity extends AppCompatActivity {
         new GetLocationsTask(MainActivity.this).execute();
         setContentView(R.layout.activity_main);
 
+        Log.d("ATLAS","on create main activity");
 
-        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        final GlobalContext globalContext = (GlobalContext) getApplicationContext();
         Log.d("MainActivity ",  Integer.toString(globalContext.getSessionId()));
         //TODO:check the cookie if the user has logged in. if not, go to login activity
         //Intent intent = new Intent(this, LoginActivity.class);
@@ -61,7 +66,10 @@ public class MainActivity extends AppCompatActivity {
         img_currentquiz.setClickable(true);//TODO:according to the detect of wifi to define whether the user can answer now
         img_currentquiz.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(globalContext);
+
                 Intent intent = new Intent(v.getContext(), CurrentQuizActivity.class);
+                //intent.putExtra("stock_ans",ans);
                 startActivity(intent);
             }
         });

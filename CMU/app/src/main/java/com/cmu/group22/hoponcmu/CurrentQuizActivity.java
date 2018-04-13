@@ -10,6 +10,7 @@ import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import classes.Answers;
 import classes.Question;
 
 import java.util.ArrayList;
@@ -22,12 +23,16 @@ public class CurrentQuizActivity extends AppCompatActivity {
     Button nextBtn;
     Button backBtn;
     int currentPos = 0;
-    ArrayList<Integer> ans = new ArrayList<>();
+    Answers ans;
+
     RadioGroup radioAnsGroup;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_currentquiz);
+
+        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        ans = globalContext.getAnswers();
 
         getCurrentLocation();
         TextView title = (TextView) findViewById (R.id.QuizTitle);
@@ -38,7 +43,14 @@ public class CurrentQuizActivity extends AppCompatActivity {
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
 
+
+        //ans = (Answers) getIntent().getSerializableExtra("stock_ans");
+        ans.list();
+        ans.init(quizItems);
+        ans.set(1,2);
+        ans.list();
         resetCurrentquiz();
+
 
         nextBtn.setOnClickListener(onClickListener);
         backBtn.setOnClickListener(onClickListener);
@@ -81,6 +93,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         backBtn.setEnabled(false);
                         //TODO: to submit ans
                         Log.d("ATLAS",ans.toString());
+                        ans.clear();
                         return;
                     }
                     break;
@@ -110,10 +123,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
         quizItems.add(new Question("How long it has been7?","1y7","2y","3y","4y"));
         quizItems.add(new Question("How long it has been8?","1y8","2y","3y","4y"));
 
-        //initialize the ans
-        for(Question q: quizItems){
-            ans.add(0);
-        };
     }
 
     protected void resetCurrentquiz(){
@@ -141,7 +150,9 @@ public class CurrentQuizActivity extends AppCompatActivity {
         btn3.setText(q.getAnswer3());
         Button btn4 = (Button) findViewById(R.id.Btn_option4);
         btn4.setText(q.getAnswer4());
+
         //recover ans
+
         switch (ans.get(currentPos)){
             case 1:
                 radioAnsGroup.check(R.id.Btn_option1);
@@ -159,6 +170,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                 radioAnsGroup.clearCheck();
                 break;
         }
+
 
     }
 
