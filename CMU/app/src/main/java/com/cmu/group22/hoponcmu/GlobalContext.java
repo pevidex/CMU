@@ -20,4 +20,8 @@ public class GlobalContext extends Application {
 
     public Answers getAnswers(){ return this.ans; }
 
+    public void setAnswers(Answers a){
+        ans = a;
+    }
+
 }

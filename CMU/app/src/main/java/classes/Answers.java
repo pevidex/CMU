@@ -9,7 +9,7 @@ import java.util.List;
 
 public class Answers implements Serializable{
     private ArrayList<Integer> ans = new ArrayList<>();
-    public void init(List<Question> quizItems){
+    public void init(ArrayList<Question> quizItems){
         //initialize the ans(make sure only the first time to initialize)
         if(ans.isEmpty()){
             Log.d("ATLAS","is empty");

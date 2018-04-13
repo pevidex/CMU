@@ -16,8 +16,9 @@ public class AnswersCommand implements Command {
         answers = new ArrayList<Integer>();
     }
 
-    public AnswersCommand(ArrayList<Integer> al) {
+    public AnswersCommand(ArrayList<Integer> al, String l) {
         answers = al;
+        location = l;
     }
 
     public ArrayList<Integer> getAnswers() {

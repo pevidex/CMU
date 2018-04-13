@@ -81,9 +81,15 @@ public class CommandHandlerImpl implements CommandHandler {
 		ArrayList<Boolean> answersResult = new ArrayList<Boolean>();
 		ArrayList<Integer> answers = ac.getAnswers();
 		
+		System.out.println("Questions size: " + questions.size());
+		System.out.println("Ans size: " + answers.size());
+		
 		for(int i = 0; i < answers.size(); i++){
+			System.out.println(i);
 			int correctAnswer = questions.get(i).getCorrectAnswer();
 			Boolean result = correctAnswer == answers.get(i);
+			System.out.println("Answer="+ answers.get(i) + " Result="+ correctAnswer);
+
 			answersResult.add(result);
 		}
 		

@@ -28,7 +28,6 @@ public class GetQuestionsTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(String[] params) {
         Socket server = null;
         String reply = null;
-        ArrayList<Question> questions=null;
         //ResponseHandlerImpl handler = new ResponseHandlerImpl();
         GetQuestionsCommand glc = new GetQuestionsCommand(params[0]);
         try {
@@ -38,12 +37,7 @@ public class GetQuestionsTask extends AsyncTask<String, Void, String> {
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
             GetQuestionsResponse gqr = (GetQuestionsResponse) ois.readObject();
 
-            if(gqr==null)
-                Log.d("OKKKKKKKK","lr null");
             this.questions = gqr.getQuestions();
-            if(this.questions==null)
-                Log.d("OKKKKKKKK","questions null");
-
             currentQuizActivity.updateQuestions(this.questions);
             Log.d("DummyClient","Questions received");
             oos.close();

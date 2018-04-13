@@ -1,5 +1,6 @@
 package com.cmu.group22.hoponcmu;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,7 +25,6 @@ import java.util.List;
 public class CurrentQuizActivity extends AppCompatActivity {
     private String currentLocation = null;
     ListView listView;
-    List<Question> quizItems = new ArrayList<Question>();
     Button nextBtn;
     Button backBtn;
     int currentPos = 0;
@@ -34,21 +34,26 @@ public class CurrentQuizActivity extends AppCompatActivity {
     ArrayList<Question> questions;
     ArrayList<Boolean> answersResults = null;
 
+    GlobalContext globalContext;
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_currentquiz);
 
-        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        globalContext = (GlobalContext) getApplicationContext();
         ans = globalContext.getAnswers();
 
 
         setCurrentLocation(getIntent().getStringExtra("location"));
-        new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
+        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
         //error here because questions are not setup in time on task. need to wait for the task to complete
+
+        try{
+            String temp = g.get();}
+        catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
 
         TextView title = (TextView) findViewById (R.id.QuizTitle);
         title.setText(currentLocation);
-        setQuizItemList();
 
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
@@ -57,9 +62,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
         //ans = (Answers) getIntent().getSerializableExtra("stock_ans");
         ans.list();
-        ans.init(quizItems);
-        ans.set(1,2);
-        ans.list();
+        ans.init(questions);
         resetCurrentquiz();
 
 
@@ -99,10 +102,11 @@ public class CurrentQuizActivity extends AppCompatActivity {
                     break;
                 case R.id.Btn_sumbit:
                     currentPos++;
-                    if(currentPos == quizItems.size()){
+                    if(currentPos == questions.size()){
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
-                        new SendAnswersTask(CurrentQuizActivity.this).execute();
+                        ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
+                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation).execute();
                         ans.clear();
                         return;
                     }
@@ -116,9 +120,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
         }
     };
 
-
-
-
     protected void setCurrentLocation(String location){
         this.currentLocation = location;
     }
@@ -128,36 +129,24 @@ public class CurrentQuizActivity extends AppCompatActivity {
     }
 
     public void updateAnswers(ArrayList<Boolean> results){
+        Log.d("CurrentQuizzActivity: ", "Receiving update answers");
         this.answersResults = results;
+
         int correctAnswers = 0;
 
-        for(Boolean b : results){
+        for(Boolean b : answersResults){
+            Log.d("CurrentQuizz", "" +b);
             if(b) correctAnswers++;
         }
 
-        Toast.makeText(CurrentQuizActivity.this, correctAnswers,
-                Toast.LENGTH_LONG).show();
-    }
-
-
-
-    protected void setQuizItemList(){
-        quizItems.add(new Question("How long it has been1?","1y1","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been2?","1y2","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been3?","1y3","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been4?","1y4","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been5?","1y5","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been6?","1y6","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been7?","1y7","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been8?","1y8","2y","3y","4y"));
-
+        Log.d("CurrentQuiz", "Number of correct answers: " + correctAnswers);
     }
 
     protected void resetCurrentquiz(){
-        Question q = quizItems.get(currentPos);
+        Question q = questions.get(currentPos);
 
         //disable button
-        if(currentPos == quizItems.size()-1){
+        if(currentPos == questions.size()-1){
             nextBtn.setText("SUBMIT");
         }else if(currentPos == 0){
             nextBtn.setEnabled(true);
@@ -206,6 +195,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
     public void updateInterface(String reply) {
         Toast.makeText(CurrentQuizActivity.this, reply,
                 Toast.LENGTH_LONG).show();
+    }
+
+    public void updateAnswersViews(){
+        //TODO Edit necessary views to display correct answers
     }
 
 }

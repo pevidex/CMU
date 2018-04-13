@@ -8,6 +8,7 @@ import com.cmu.group22.hoponcmu.GlobalContext;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -22,9 +23,13 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
 
     private CurrentQuizActivity currentQuizActivity;
     ArrayList<Boolean> answersResults;
+    ArrayList<Integer> answers;
+    String location;
 
-    public SendAnswersTask(CurrentQuizActivity currentQuizActivity) {
+    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l) {
         this.currentQuizActivity = currentQuizActivity;
+        this.answers = a;
+        this.location = l;
     }
 
 
@@ -33,10 +38,8 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
         Socket server = null;
         String reply = null;
         //ResponseHandlerImpl handler = new ResponseHandlerImpl();
-        GlobalContext globalContext = (GlobalContext)  currentQuizActivity.getApplicationContext();
-        Answers answers = globalContext.getAnswers();
-
-        AnswersCommand ac = new AnswersCommand(answers.getAnswers());
+        Log.d("Answers Task", "Size: " + answers.size());
+        AnswersCommand ac = new AnswersCommand(answers, location);
 
         try {
             server = new Socket("10.0.2.2", 9090);
@@ -54,10 +57,8 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
                 Log.d("OKKKKKKKK","questions null");
 
             currentQuizActivity.updateAnswers(this.answersResults);
-            Log.d("DummyClient","Questions received");
             oos.close();
             ois.close();
-            Log.d("DummyClient", "Hi there!!");
         }
         catch (Exception e) {
             Log.d("DummyClient", "DummyTask failed..." + e.getMessage());
@@ -73,8 +74,6 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String o) {
-        if (o!=null) {
-            currentQuizActivity.updateInterface(o);
-        }
+        currentQuizActivity.updateAnswersViews();
     }
 }
