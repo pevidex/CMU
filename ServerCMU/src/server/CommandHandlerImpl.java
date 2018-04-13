@@ -19,6 +19,7 @@ import java.util.Random;
 import classes.User;
 import classes.Location;
 import classes.Question;
+import classes.Quizz;
 
 public class CommandHandlerImpl implements CommandHandler {
 
@@ -26,6 +27,7 @@ public class CommandHandlerImpl implements CommandHandler {
 	ArrayList<String> available_codes;//codes generated for the users tickets
 	ArrayList<Location> locations;
 	HashMap<String, ArrayList<Question>> globalQuestions; 
+	ArrayList<Quizz> quizzes;
 	
 	CommandHandlerImpl(){
 		users=new ArrayList<User>();
@@ -33,7 +35,8 @@ public class CommandHandlerImpl implements CommandHandler {
 		locations = new ArrayList<Location>();
 		addLocations();
 		addCodes();
-
+		
+		quizzes = new ArrayList<Quizz>();
 		globalQuestions = new HashMap<String, ArrayList<Question>>();
 		setGlobalQuestions();
 	}
@@ -75,8 +78,9 @@ public class CommandHandlerImpl implements CommandHandler {
 		String location = qc.getLocation();
 
 		ArrayList<Question> questions = globalQuestions.get(location);	//Get questions for that location
-
-		return new GetQuestionsResponse(questionsToClient(questions));
+		if(questions==null || questions.size()<1)
+			return new GetQuestionsResponse(null,false);
+		return new GetQuestionsResponse(questionsToClient(questions),true);
 	}
 
 	public User findUser(String username){
@@ -113,7 +117,7 @@ public class CommandHandlerImpl implements CommandHandler {
 
 	@Override
 	public Response handle(GetLocationsCommand c) {
-		return new GetLocationsResponse(locations);
+		return new GetLocationsResponse(locations,true);
 	}
 
 	//Set HardCoded Questions
@@ -131,6 +135,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		questions.add(q1);
 		questions.add(q1);
 
+		quizzes.add(new Quizz("belem tower",questions));
 		globalQuestions.put("belem tower", questions);
 	}
 
