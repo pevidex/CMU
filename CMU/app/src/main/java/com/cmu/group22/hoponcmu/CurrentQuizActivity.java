@@ -7,11 +7,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import classes.QuizItem;
+
+import classes.Question;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.List;
 public class CurrentQuizActivity extends AppCompatActivity {
     private String currentLocation = null;
     ListView listView;
-    List<QuizItem> quizItems = new ArrayList<QuizItem>();
+    List<Question> quizItems = new ArrayList<Question>();
     Button nextBtn;
     Button backBtn;
     int currentPos = 0;
@@ -102,23 +101,23 @@ public class CurrentQuizActivity extends AppCompatActivity {
     }
 
     protected void setQuizItemList(){
-        quizItems.add(new QuizItem("How long it has been1?","1y1","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been2?","1y2","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been3?","1y3","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been4?","1y4","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been5?","1y5","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been6?","1y6","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been7?","1y7","2y","3y","4y"));
-        quizItems.add(new QuizItem("How long it has been8?","1y8","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been1?","1y1","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been2?","1y2","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been3?","1y3","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been4?","1y4","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been5?","1y5","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been6?","1y6","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been7?","1y7","2y","3y","4y"));
+        quizItems.add(new Question("How long it has been8?","1y8","2y","3y","4y"));
 
         //initialize the ans
-        for(QuizItem q: quizItems){
+        for(Question q: quizItems){
             ans.add(0);
         };
     }
 
     protected void resetCurrentquiz(){
-        QuizItem q = quizItems.get(currentPos);
+        Question q = quizItems.get(currentPos);
 
         //disable button
         if(currentPos == quizItems.size()-1){
@@ -133,17 +132,16 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
         //save ans
         TextView textView = (TextView) findViewById(R.id.question);
-        textView.setText((currentPos+1)+"."+q.question);
+        textView.setText((currentPos+1)+"."+q.getQuestion());
         Button btn1 = (Button) findViewById(R.id.Btn_option1);
-        btn1.setText(q.option1);
+        btn1.setText(q.getAnswer1());
         Button btn2 = (Button) findViewById(R.id.Btn_option2);
-        btn2.setText(q.option2);
+        btn2.setText(q.getAnswer2());
         Button btn3 = (Button) findViewById(R.id.Btn_option3);
-        btn3.setText(q.option3);
+        btn3.setText(q.getAnswer3());
         Button btn4 = (Button) findViewById(R.id.Btn_option4);
-        btn4.setText(q.option4);
+        btn4.setText(q.getAnswer4());
         //recover ans
-        Log.d("ATLAS",currentPos+" and "+ans);
         switch (ans.get(currentPos)){
             case 1:
                 radioAnsGroup.check(R.id.Btn_option1);
