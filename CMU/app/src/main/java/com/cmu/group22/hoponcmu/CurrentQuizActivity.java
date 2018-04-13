@@ -23,7 +23,7 @@ import java.util.List;
 public class CurrentQuizActivity extends AppCompatActivity {
     private String currentLocation = null;
     ListView listView;
-    List<Question> quizItems = new ArrayList<Question>();
+
     Button nextBtn;
     Button backBtn;
     int currentPos = 0;
@@ -41,12 +41,15 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
 
         setCurrentLocation(getIntent().getStringExtra("location"));
-        new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
+        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
         //error here because questions are not setup in time on task. need to wait for the task to complete
+
+        try{
+            String temp = g.get();}
+        catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
 
         TextView title = (TextView) findViewById (R.id.QuizTitle);
         title.setText(currentLocation);
-        setQuizItemList();
 
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
@@ -55,7 +58,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
         //ans = (Answers) getIntent().getSerializableExtra("stock_ans");
         ans.list();
-        ans.init(quizItems);
+        ans.init(questions);
         ans.set(1,2);
         ans.list();
         resetCurrentquiz();
@@ -97,7 +100,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                     break;
                 case R.id.Btn_sumbit:
                     currentPos++;
-                    if(currentPos == quizItems.size()){
+                    if(currentPos == questions.size()){
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
                         //TODO: to submit ans
@@ -124,25 +127,15 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     public void updateQuestions(ArrayList<Question> questions){
 
-        this.questions = questions;}
-
-    protected void setQuizItemList(){
-        quizItems.add(new Question("How long it has been1?","1y1","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been2?","1y2","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been3?","1y3","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been4?","1y4","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been5?","1y5","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been6?","1y6","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been7?","1y7","2y","3y","4y"));
-        quizItems.add(new Question("How long it has been8?","1y8","2y","3y","4y"));
-
+        this.questions = questions;
+        Log.d("QUESTIONs",Integer.toString(questions.size()));
     }
 
     protected void resetCurrentquiz(){
-        Question q = quizItems.get(currentPos);
+        Question q = questions.get(currentPos);
 
         //disable button
-        if(currentPos == quizItems.size()-1){
+        if(currentPos == questions.size()-1){
             nextBtn.setText("SUBMIT");
         }else if(currentPos == 0){
             nextBtn.setEnabled(true);
