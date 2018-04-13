@@ -3,6 +3,7 @@ package classes;
 import android.util.Log;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,11 @@ public class Answers implements Serializable{
             };
         }
     }
+
+    public ArrayList<Integer> getAnswers(){
+        return ans;
+    }
+
     public void set(int index,Integer value){
         ans.set(index,value);
     }

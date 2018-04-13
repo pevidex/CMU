@@ -1,10 +1,12 @@
 package server;
 
+import command.AnswersCommand;
 import command.CommandHandler;
 import command.GetLocationsCommand;
 import command.GetQuestionsCommand;
 import command.LoginCommand;
 import command.RegisterCommand;
+import response.AnswersResponse;
 import response.GetLocationsResponse;
 import response.GetQuestionsResponse;
 import response.LoginResponse;
@@ -14,6 +16,7 @@ import response.Response;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import classes.User;
@@ -67,6 +70,24 @@ public class CommandHandlerImpl implements CommandHandler {
 		System.out.println("Register: User "+rc.getUsername()+" registered!\n");
 		return new RegisterResponse("Register: Registered with success!",true);
 		
+	}
+	
+	@Override
+	public Response handle(AnswersCommand ac){
+		System.out.println("Received: Answers Command");
+		
+		String location = ac.getLocation();
+		ArrayList<Question> questions = globalQuestions.get(location);
+		ArrayList<Boolean> answersResult = new ArrayList<Boolean>();
+		ArrayList<Integer> answers = ac.getAnswers();
+		
+		for(int i = 0; i < answers.size(); i++){
+			int correctAnswer = questions.get(i).getCorrectAnswer();
+			Boolean result = correctAnswer == answers.get(i);
+			answersResult.add(result);
+		}
+		
+		return new AnswersResponse(answersResult);
 	}
 
 	@Override
@@ -124,7 +145,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		q1.setAnswer2("Kovalchuk");
 		q1.setAnswer3("Quintino");
 		q1.setAnswer4("Xavier");
-		q1.setCorrectAnswer("Xavier");
+		q1.setCorrectAnswer(4);
 
 		ArrayList<Question> questions = new ArrayList<Question>();
 		questions.add(q1);

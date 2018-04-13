@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
+import com.cmu.group22.hoponcmu.Task.SendAnswersTask;
 
 import classes.Answers;
 import classes.Question;
@@ -31,6 +32,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     RadioGroup radioAnsGroup;
     ArrayList<Question> questions;
+    ArrayList<Boolean> answersResults = null;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -100,8 +102,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                     if(currentPos == quizItems.size()){
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
-                        //TODO: to submit ans
-                        Log.d("ATLAS",ans.toString());
+                        new SendAnswersTask(CurrentQuizActivity.this).execute();
                         ans.clear();
                         return;
                     }
@@ -123,8 +124,22 @@ public class CurrentQuizActivity extends AppCompatActivity {
     }
 
     public void updateQuestions(ArrayList<Question> questions){
+        this.questions = questions;
+    }
 
-        this.questions = questions;}
+    public void updateAnswers(ArrayList<Boolean> results){
+        this.answersResults = results;
+        int correctAnswers = 0;
+
+        for(Boolean b : results){
+            if(b) correctAnswers++;
+        }
+
+        Toast.makeText(CurrentQuizActivity.this, correctAnswers,
+                Toast.LENGTH_LONG).show();
+    }
+
+
 
     protected void setQuizItemList(){
         quizItems.add(new Question("How long it has been1?","1y1","2y","3y","4y"));
