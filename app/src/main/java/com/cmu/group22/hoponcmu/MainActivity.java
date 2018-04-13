@@ -15,16 +15,16 @@ public class MainActivity extends AppCompatActivity {
     ImageView img_msgbox;
 
     static final String[][] LOCATIONS = new String[][]{
-            {"belem tower","res/1.jpg "},
-            {"cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
-            {"Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"},
-            {"25 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"},
-            {"belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"},
-            {"cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
-            {"Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"},
-            {"25 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"},
-            {"belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"},
-            {"cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
+            {"1belem tower","res/1.jpg "},
+            {"2cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
+            {"3Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"},
+            {"425 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"},
+            {"5belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"},
+            {"6cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
+            {"7Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"},
+            {"825 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"},
+            {"9belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"},
+            {"10cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
     };
 
     @Override
