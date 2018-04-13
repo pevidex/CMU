@@ -91,9 +91,11 @@
 
     <Button
         android:id="@+id/Btn_leave"
-        android:layout_width="53dp"
-        android:layout_height="45dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:background="@drawable/home_icon"
         android:text=""
         app:layout_constraintBottom_toBottomOf="@+id/QuizTitle"
@@ -102,9 +104,11 @@
 
     <Button
         android:id="@+id/Btn_msg"
-        android:layout_width="50dp"
-        android:layout_height="47dp"
+        android:layout_width="30dp"
+        android:layout_height="28dp"
+        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
         android:background="@android:drawable/sym_action_email"
         android:text=""
         app:layout_constraintBottom_toBottomOf="@+id/QuizTitle"

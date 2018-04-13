@@ -55,12 +55,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
 
-
-        //ans = (Answers) getIntent().getSerializableExtra("stock_ans");
-        ans.list();
         ans.init(questions);
-        ans.set(1,2);
-        ans.list();
         resetCurrentquiz();
 
 

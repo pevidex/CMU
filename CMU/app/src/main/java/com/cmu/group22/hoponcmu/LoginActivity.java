@@ -36,7 +36,6 @@ public class LoginActivity extends AppCompatActivity {
                 EditText userName = (EditText) findViewById(R.id.etUsername);
                 EditText code = (EditText) findViewById(R.id.etCode);
                 new LoginTask(LoginActivity.this).execute(userName.getText().toString(),code.getText().toString());
-
             }
         });
 
