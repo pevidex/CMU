@@ -23,4 +23,9 @@ public class ResponseHandlerImpl implements ResponseHandler {
     public void handle(GetQuestionsResponse qr) {
 
     }
+
+    @Override
+    public void handle(AnswersResponse ar){
+
+    }
 }
