@@ -15,7 +15,6 @@ import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
 
 import classes.Question;
 
-import classes.Question;
 
 import java.util.ArrayList;
 import java.util.List;
