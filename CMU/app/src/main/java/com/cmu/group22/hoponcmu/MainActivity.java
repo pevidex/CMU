@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Log.d("ATLAS","on create main activity");
-
         final GlobalContext globalContext = (GlobalContext) getApplicationContext();
         Log.d("MainActivity ",  Integer.toString(globalContext.getSessionId()));
         //TODO:check the cookie if the user has logged in. if not, go to login activity
@@ -81,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         img_myquizs.setClickable(true);
         img_myquizs.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), LoginActivity.class);//TODO:change me
+                Intent intent = new Intent(v.getContext(), MyQuizActivity.class);//TODO:change me
                 startActivity(intent);
             }
         });
