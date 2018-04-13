@@ -9,9 +9,13 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
 
 import classes.Answers;
 import classes.Question;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +30,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
     Answers ans;
 
     RadioGroup radioAnsGroup;
+    ArrayList<Question> questions;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -34,7 +39,11 @@ public class CurrentQuizActivity extends AppCompatActivity {
         GlobalContext globalContext = (GlobalContext) getApplicationContext();
         ans = globalContext.getAnswers();
 
-        getCurrentLocation();
+
+        setCurrentLocation(getIntent().getStringExtra("location"));
+        new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
+        //error here because questions are not setup in time on task. need to wait for the task to complete
+
         TextView title = (TextView) findViewById (R.id.QuizTitle);
         title.setText(currentLocation);
         setQuizItemList();
@@ -109,9 +118,13 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
 
 
-    protected void getCurrentLocation(){
-        this.currentLocation = "Cascais";
+    protected void setCurrentLocation(String location){
+        this.currentLocation = location;
     }
+
+    public void updateQuestions(ArrayList<Question> questions){
+
+        this.questions = questions;}
 
     protected void setQuizItemList(){
         quizItems.add(new Question("How long it has been1?","1y1","2y","3y","4y"));
@@ -174,5 +187,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     }
 
+
+    public void updateInterface(String reply) {
+        Toast.makeText(CurrentQuizActivity.this, reply,
+                Toast.LENGTH_LONG).show();
+    }
 
 }

@@ -37,6 +37,7 @@ public class GetLocationsTask extends AsyncTask<String, Void, String> {
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
             GetLocationsResponse lr = (GetLocationsResponse) ois.readObject();
             this.locations = lr.getLocations();
+            mainActivity.updateLocations(this.locations);
             Log.d("DummyClient","Locations received");
             oos.close();
             ois.close();
@@ -56,8 +57,7 @@ public class GetLocationsTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String o) {
-        if (this.locations != null && o!=null) {
-            mainActivity.updateLocations(this.locations);
+        if (o!=null) {
             mainActivity.updateInterface(o);
         }
     }

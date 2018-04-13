@@ -1,23 +1,23 @@
 package response;
 
-import java.util.List;
+import java.util.ArrayList;
 
 import classes.Question;
 
 public class GetQuestionsResponse implements Response {
 
     private static final long serialVersionUID = 734457624276534179L;
-    private List<Question> questions;
+    private ArrayList<Question> questions;
 
-    public GetQuestionsResponse (List<Question> qs) {
+    public GetQuestionsResponse (ArrayList<Question> qs) {
         this.questions = qs;
     }
 
-    public List<Question> getQuestions(){
+    public ArrayList<Question> getQuestions(){
     	return questions;
     }
 
-    public void setQuestions(List<Question> qs){
+    public void setQuestions(ArrayList<Question> qs){
     	this.questions = qs;
     }
 }

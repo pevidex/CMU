@@ -10,13 +10,17 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
+import classes.Location;
+
 public class InitLocations extends BaseAdapter {
     private Context context;
-    private final String[][] locationItems;
+    private final ArrayList<Location> locations;
 
-    public InitLocations(Context context, String[][] locationItems){
+    public InitLocations(Context context, ArrayList<Location> locations){
         this.context = context;
-        this.locationItems = locationItems;
+        this.locations = locations;
     }
 
     public View getView(int position, View convertView, ViewGroup parent){
@@ -32,7 +36,7 @@ public class InitLocations extends BaseAdapter {
 
 
         TextView textView = (TextView) listView.findViewById(R.id.grid_locations_label);
-        textView.setText(locationItems[position][0]);
+        textView.setText(locations.get(position).getName());
         ImageView imageView = (ImageView) listView.findViewById(R.id.grid_locations_image);
         //int imageId = context.getResources().getIdentifier(locationItems[position][1], null, context.getPackageName());
         //imageView.setImageResource(imageId);
@@ -43,7 +47,7 @@ public class InitLocations extends BaseAdapter {
 
     @Override
     public int getCount(){
-        return locationItems.length;
+        return locations.size();
     }
 
     @Override

@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<Location> locations=null;
 
-    static final String[][] LOCATIONS = new String[][]{
+    /*static final String[][] LOCATIONS = new String[][]{
             {"1belem tower","res/1.jpg "},
             {"2cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
             {"3Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"},
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             {"825 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"},
             {"9belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"},
             {"10cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"},
-    };
+    };*/
 
     Button btLogin;
 
@@ -69,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(globalContext);
 
                 Intent intent = new Intent(v.getContext(), CurrentQuizActivity.class);
-                //intent.putExtra("stock_ans",ans);
+
+                intent.putExtra("location","belem tower");//need to know which location we're at
+
                 startActivity(intent);
             }
         });
@@ -91,14 +93,14 @@ public class MainActivity extends AppCompatActivity {
 
         //init the list of locations
         listView = (ListView) findViewById(R.id.listView_locationslist);
-        listView.setAdapter(new InitLocations(this, LOCATIONS));
+        listView.setAdapter(new InitLocations(this, locations));
 
         //TODO: maybe there should be some click actions on locations?
 
     }
     public void updateLocations(ArrayList<Location> locations){
         this.locations=locations;
-        Log.d("DummyClient Updt", locations.get(0).getName());
+        Log.d("updateLocations", Integer.toString(locations.size()));
     }
     public void updateInterface(String reply) {
         Toast.makeText(MainActivity.this, reply,

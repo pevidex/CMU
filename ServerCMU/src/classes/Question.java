@@ -1,7 +1,11 @@
 package classes;
 
-public class Question {
+public class Question implements QuestionInterface{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 121L;
 	String question; 
 	String answer1, answer2, answer3, answer4; 
 	String correctAnswer; 

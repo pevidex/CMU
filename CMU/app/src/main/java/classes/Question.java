@@ -1,26 +1,28 @@
 package classes;
 
-public class Question {
-	
-	String question; 
-	String answer1, answer2, answer3, answer4; 
-	String correctAnswer; 
+public class Question implements QuestionInterface{
 
-	
+
+	private static final long serialVersionUID = 121L;
+	String question;
+	String answer1, answer2, answer3, answer4;
+	String correctAnswer;
+
+
 	public Question(String q, String a1, String a2, String a3, String a4, String ca){
 		this.question = q;
 		this.answer1 = a1;
-		this.answer2 = a2; 
+		this.answer2 = a2;
 		this.answer3 = a3;
 		this.answer4 = a4;
-		this.correctAnswer = ca;	
+		this.correctAnswer = ca;
 	}
 
 	//Constructor without correct answer
 	public Question(String q, String a1, String a2, String a3, String a4){
 		this.question = q;
 		this.answer1 = a1;
-		this.answer2 = a2; 
+		this.answer2 = a2;
 		this.answer3 = a3;
 		this.answer4 = a4;
 		this.correctAnswer = null;
@@ -69,11 +71,11 @@ public class Question {
 	public void setAnswer4(String a4){
 		this.answer4 = a4;
 	}
-	
+
 	public String getCorrectAnswer(){
 		return this.correctAnswer;
 	}
-	
+
 	public void setCorrectAnswer(String ca){
 		this.correctAnswer = ca;
 	}
