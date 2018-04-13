@@ -1,0 +1,7 @@
+package classes;
+import java.io.Serializable;
+
+
+public interface AnsweredQuizzInterface extends Serializable{
+
+}

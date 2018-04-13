@@ -1,0 +1,12 @@
+package classes;
+
+import java.util.ArrayList;
+
+public class Quizz {
+	private ArrayList<Question> questions;
+	private String location;
+	
+	Quiz(String location, ArrayList<Question> questions){
+		this.questions=questions;
+	}
+}
