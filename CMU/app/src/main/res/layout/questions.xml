@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/AnswersResult_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="1. How long it has been?"
+        android:textSize="20dp" />
+
+    <RadioGroup
+        android:id="@+id/AnswersResult_radio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/AnswersResult_Btn_option1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="10years"
+            android:textSize="20dp" />
+
+        <RadioButton
+            android:id="@+id/AnswersResult_Btn_option2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="11years"
+            android:textSize="20dp" />
+
+        <RadioButton
+            android:id="@+id/AnswersResult_Btn_option3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="13years"
+            android:textSize="20dp" />
+
+        <RadioButton
+            android:id="@+id/AnswersResult_Btn_option4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="16years"
+            android:textSize="20dp" />
+    </RadioGroup>
+
+</LinearLayout>
