@@ -11,11 +11,25 @@ public class AnswersCommand implements Command {
 
     private String location; //To know which questions are these answers for.
     private ArrayList<Integer> answers;
+    private String userName;
 
-    public AnswersCommand() {
+    public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public AnswersCommand() {
         answers = new ArrayList<Integer>();
     }
-
+	public AnswersCommand(String location, ArrayList<Integer> answers, String userName)
+	{
+		this.location = location;
+		this.answers = answers;
+		this.userName = userName;
+	}
     public AnswersCommand(ArrayList<Integer> al) {
         answers = al;
     }

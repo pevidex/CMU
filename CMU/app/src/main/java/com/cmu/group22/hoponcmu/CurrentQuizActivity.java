@@ -46,8 +46,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
         setCurrentLocation(getIntent().getStringExtra("location"));
         GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
-        //error here because questions are not setup in time on task. need to wait for the task to complete
-
         try{
             String temp = g.get();}
         catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
@@ -58,7 +56,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
-
+        Log.d("ATLAS","questionsize"+questions.size());
+        Log.d("ATLAS","question1"+questions.get(0).getQuestion());
+        Log.d("ATLAS","question2"+questions.get(1).getQuestion());
+        Log.d("ATLAS","question3"+questions.get(2).getQuestion());
         ans.init(questions);
         resetCurrentquiz();
 
@@ -103,7 +104,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
-                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation).execute();
+                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
                         ans.clear();
                         return;
                     }

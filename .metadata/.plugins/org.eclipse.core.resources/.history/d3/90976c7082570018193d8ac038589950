@@ -1,0 +1,9 @@
+package classes;
+
+import java.util.ArrayList;
+
+public class AnsweredQuizz {
+	Quizz quizz;
+	Map<User,ArrayList<Integer>> answers;
+	public AnsweredQuizz(Quizz q){quiz=q;}
+}

@@ -13,16 +13,23 @@ import java.util.List;
 
 import classes.Question;
 
+import com.cmu.group22.hoponcmu.Task.UserLocationHistoryTask;
+
 public class QuizResultActivity extends AppCompatActivity {
 
     ListView listView;
 
     private String currentLocation = null;
-    private List<Question> questions = new ArrayList<>();
+    private List<Question> questions = new ArrayList<Question>();
+    private List<Boolean> userResult= new ArrayList<Boolean>();
+    private List<Integer> userAnswers= new ArrayList<Integer>();
 
-
+    GlobalContext globalContext;
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("ATLAS","start quizresult");
+
         super.onCreate(savedInstanceState);
+        globalContext = (GlobalContext) getApplicationContext();
         setContentView(R.layout.activity_quizresult);
 
         String name_of_quiz;
@@ -34,26 +41,30 @@ public class QuizResultActivity extends AppCompatActivity {
             return;
         }
         currentLocation = name_of_quiz;
+        UserLocationHistoryTask u = (UserLocationHistoryTask) new UserLocationHistoryTask(QuizResultActivity.this).execute(globalContext.getUserName(),name_of_quiz);
+        try{
+            String temp = u.get();}
+        catch(Exception e){Log.d("QuizResultActivity","task error");}
 
         TextView title = (TextView) findViewById(R.id.AnswerResultTItle);
         title.setText(currentLocation);
 
         listView = (ListView) findViewById(R.id.AnswersResult);
-
-        setMyAnswers(null);
-    }
-
-    private void setMyAnswers(List<Question> questionList) {
-        //for debug
-        //questionList.add(new Question())
-        questions.add(new Question("body1","c1","c2","c3","c4"));
-        questions.add(new Question("body2","c1","c2","c3","c4"));
-        questions.add(new Question("body3","c1","c2","c3","c4"));
-        listView.setAdapter(new InitAnswers(this,questions));
-
-
+        Log.d("ATLAS","start setadapter");
+        listView.setAdapter(new InitAnswers(this,questions,userResult,userAnswers));
 
     }
 
+
+    public void updateInterface(ArrayList<Question> questions, ArrayList<Boolean> userResult, ArrayList<Integer> userAnswers){
+        Log.d("Ricardo","questions size: "+questions.size());
+        if(questions!=null)
+            this.questions=questions;
+        if(userResult!=null)
+            this.userResult=userResult;
+        if(userAnswers!=null)
+            this.userAnswers=userAnswers;
+
+    }
 
 }

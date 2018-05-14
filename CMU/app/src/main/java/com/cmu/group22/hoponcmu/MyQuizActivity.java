@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.cmu.group22.hoponcmu.Task.UserHistoryTask;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,16 +18,17 @@ import classes.Location;
 public class MyQuizActivity extends AppCompatActivity {
 
     ListView listView;
-
+    GlobalContext globalContext;
     List<Location> locations= new ArrayList<>();
 
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_myquiz);
-
+        locations= new ArrayList<Location>();
+        globalContext = (GlobalContext) getApplicationContext();
         listView = (ListView) findViewById(R.id.listView_myquiz);
-
+        new UserHistoryTask(MyQuizActivity.this).execute(globalContext.getUserName());
         setMyquiz(locations);
 
     }
@@ -34,14 +37,6 @@ public class MyQuizActivity extends AppCompatActivity {
     }
 
     private void setMyquiz(List< Location > locations){
-        //this.locations = locations;
-
-        //for debug
-        locations.add(new Location("L1","res/123.jpg"));
-        locations.add(new Location("L2","res/123.jpg"));
-        locations.add(new Location("L3","res/123.jpg"));
-        locations.add(new Location("L4","res/123.jpg"));
-
         listView.setAdapter(new InitLocations(this,locations));
         listView.setOnItemClickListener(quizClickListener);
 
@@ -58,5 +53,13 @@ public class MyQuizActivity extends AppCompatActivity {
             startActivity(intent);
         }
     };
+    public void updateInterface(String reply) {
+    }
+    public void updateLocations(ArrayList<Location> locations){
+
+        this.locations=locations;
+        //init the list of locations
+        listView.setAdapter(new InitLocations(this, locations));
+    }
 }
 

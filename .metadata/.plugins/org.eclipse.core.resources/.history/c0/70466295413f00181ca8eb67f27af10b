@@ -1,0 +1,6 @@
+package classes;
+
+public class Quizz {
+	private ArrayList<Question> questions;
+	private String location;
+}

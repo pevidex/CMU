@@ -36,7 +36,8 @@ public class GetQuestionsTask extends AsyncTask<String, Void, String> {
             oos.writeObject(glc);
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
             GetQuestionsResponse gqr = (GetQuestionsResponse) ois.readObject();
-
+            if(!gqr.getSuccess())
+                currentQuizActivity.updateInterface("Failed to get the locations!");
             this.questions = gqr.getQuestions();
             currentQuizActivity.updateQuestions(this.questions);
             Log.d("DummyClient","Questions received");

@@ -1,6 +1,7 @@
 package com.cmu.group22.hoponcmu;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.support.v7.widget.AppCompatRadioButton;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,12 +22,14 @@ import classes.Question;
 public class InitAnswers extends BaseAdapter{
     private Context context;
     private final List<Question> questions;
+    private final ArrayList<Boolean> userResult;
+    private final ArrayList<Integer> userAnswers;
 
-    public InitAnswers(Context context, List<Question> questions) {
+    public InitAnswers(Context context, List<Question> questions, List<Boolean> userResult, List<Integer> userAnswers) {
         this.context = context;
         this.questions = new ArrayList<>(questions);
-        Log.d("ATLAS",this.questions.size()+"");
-
+        this.userResult = new ArrayList<>(userResult);
+        this.userAnswers = new ArrayList<>(userAnswers);
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -40,24 +44,36 @@ public class InitAnswers extends BaseAdapter{
 
         TextView textView = (TextView) listView.findViewById(R.id.AnswersResult_question);
         textView.setText(questions.get(position).getQuestion());
-
+        List<Button> buttons = new ArrayList<>();
         Button btn1 = (Button) listView.findViewById(R.id.AnswersResult_Btn_option1);
-        btn1.setText(questions.get(position).getAnswer1());
-        btn1.setSelected(true);
-        btn1.setTextColor(Color.RED);
-        btn1.setEnabled(false);
-
         Button btn2 = (Button) listView.findViewById(R.id.AnswersResult_Btn_option2);
-        btn2.setText(questions.get(position).getAnswer2());
-        btn2.setTextColor(Color.GREEN);
-        btn2.setEnabled(false);
-
-
         Button btn3 = (Button) listView.findViewById(R.id.AnswersResult_Btn_option3);
-        btn3.setText(questions.get(position).getAnswer3());
-
         Button btn4 = (Button) listView.findViewById(R.id.AnswersResult_Btn_option4);
-        btn4.setText(questions.get(position).getAnswer4());
+
+        buttons.add(btn1);
+        buttons.add(btn2);
+        buttons.add(btn3);
+        buttons.add(btn4);
+
+        int option_i = 0;
+        for(Button btn : buttons){
+            btn.setEnabled(false);
+            btn.setTextColor(Color.WHITE);
+            btn.setTag("result_"+option_i+"_"+position);
+            btn.setText(questions.get(position).getAnsweri(option_i));
+            if(userAnswers.get(position)-1==option_i)
+                if(userResult.get(position))
+                    btn.setTextColor(Color.GREEN);
+                else
+                    btn.setTextColor(Color.RED);
+            if(questions.get(position).getCorrectAnswer()==option_i)
+                btn.setTextColor(Color.GREEN);
+            option_i++;
+        }
+
+
+        Log.d("ATLAS",userAnswers.get(position)+"");
+        Log.d("ATLAS","position:"+position+"answers"+userAnswers.get(position)+"");
 
         return listView;
     }

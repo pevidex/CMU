@@ -36,6 +36,8 @@ public class GetLocationsTask extends AsyncTask<String, Void, String> {
             oos.writeObject(glc);
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
             GetLocationsResponse lr = (GetLocationsResponse) ois.readObject();
+            if(!lr.getSuccess())
+                mainActivity.updateInterface("Failed to get the locations!");
             this.locations = lr.getLocations();
             mainActivity.updateLocations(this.locations);
             Log.d("DummyClient","Locations received");

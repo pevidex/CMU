@@ -8,6 +8,7 @@ public class GlobalContext extends Application {
 
     private int sessionId = 0;
 
+    private String userName;
     private Answers ans = new Answers();
 
     public int getSessionId(){
@@ -24,4 +25,12 @@ public class GlobalContext extends Application {
         ans = a;
     }
 
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 }

@@ -25,11 +25,13 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
     ArrayList<Boolean> answersResults;
     ArrayList<Integer> answers;
     String location;
+    String userName;
 
-    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l) {
+    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l, String userName) {
         this.currentQuizActivity = currentQuizActivity;
         this.answers = a;
         this.location = l;
+        this.userName= userName;
     }
 
 
@@ -38,30 +40,32 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
         Socket server = null;
         String reply = null;
         //ResponseHandlerImpl handler = new ResponseHandlerImpl();
-        Log.d("Answers Task", "Size: " + answers.size());
-        AnswersCommand ac = new AnswersCommand(answers, location);
+        Log.d("SendAnswersTask", "Answer's Size: " + answers.size());
+        AnswersCommand ac = new AnswersCommand(location, answers,userName);
 
         try {
             server = new Socket("10.0.2.2", 9090);
+            Log.d("SendAnswersTask", "step1");
             ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
             oos.writeObject(ac);
+            Log.d("SendAnswersTask", "step2");
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
+            Log.d("SendAnswersTask", "step3");
             AnswersResponse ar = (AnswersResponse) ois.readObject();
-
             if(ar==null)
-                Log.d("OKKKKKKKK","lr null");
+                Log.d("SendAnswersTask","lr null");
 
             this.answersResults = ar.getAnswersResult();
 
             if(this.answersResults==null)
-                Log.d("OKKKKKKKK","questions null");
+                Log.d("SendAnswersTask","questions null");
 
             currentQuizActivity.updateAnswers(this.answersResults);
             oos.close();
             ois.close();
         }
         catch (Exception e) {
-            Log.d("DummyClient", "DummyTask failed..." + e.getMessage());
+            Log.d("SendAnswersTask", "failed...");
             e.printStackTrace();
         } finally {
             if (server != null) {

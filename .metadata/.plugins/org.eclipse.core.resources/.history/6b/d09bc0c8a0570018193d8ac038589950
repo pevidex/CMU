@@ -1,0 +1,32 @@
+package classes;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class AnsweredQuizz {
+	public String location;
+	Map<String,ArrayList<Integer>> answers;
+	Map<String,ArrayList<Boolean>> usersResults;
+	
+	public Map<String, ArrayList<Boolean>> getUsersResults() {
+		return usersResults;
+	}
+	public void setUsersResults(Map<String, ArrayList<Boolean>> usersResults) {
+		this.usersResults = usersResults;
+	}
+	public AnsweredQuizz(String location){
+		this.location=location;
+		answers=new HashMap<String, ArrayList<Integer>>();
+		usersResults=new HashMap<String, ArrayList<Boolean>>();
+	}
+	public void addUserAnswers(String user, ArrayList<Integer> a){
+		answers.put(user,a);
+	}
+	
+	public ArrayList<Integer> getUserAnswers(String user){
+		return answers.get(user);
+	}
+	
+	public String getLocation(){return location;}
+}

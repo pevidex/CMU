@@ -12,14 +12,14 @@ import android.widget.Toast;
 import com.cmu.group22.hoponcmu.Task.RegisterTask;
 
 public class RegisterActivity extends AppCompatActivity {
-
+    GlobalContext globalContext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
         Button btRegister = (Button) findViewById(R.id.btRegister);
         TextView btLogin = (TextView) findViewById(R.id.btLogin);
-
+        globalContext = (GlobalContext) getApplicationContext();
         btLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
@@ -30,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText userName = (EditText) findViewById(R.id.etUsername);
                 EditText code = (EditText) findViewById(R.id.etCode);
+                globalContext.setUserName(userName.getText().toString());
                 new RegisterTask(RegisterActivity.this).execute(userName.getText().toString(),code.getText().toString());
             }
         });

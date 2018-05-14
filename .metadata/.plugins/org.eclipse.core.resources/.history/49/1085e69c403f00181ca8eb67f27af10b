@@ -1,0 +1,31 @@
+package classes;
+
+import java.util.ArrayList;
+
+public class User {
+	
+	String username;
+	String code;
+	ArrayList<AnsweredQuizz> answeredQuizzes;
+	
+	public User(String u, String c){
+		username=u;
+		code=c;
+		answeredQuizzes=new ArrayList<AnsweredQuizz>();
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getCode() {
+		return code;
+	}
+	public void addAnsweredQuizz(AnsweredQuizz q){
+		answeredQuizzes.put(q);
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
+}

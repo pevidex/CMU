@@ -6,12 +6,16 @@ import command.GetLocationsCommand;
 import command.GetQuestionsCommand;
 import command.LoginCommand;
 import command.RegisterCommand;
+import command.UserHistoryCommand;
+import command.UserLocationHistoryCommand;
 import response.AnswersResponse;
 import response.GetLocationsResponse;
 import response.GetQuestionsResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import response.Response;
+import response.UserHistoryResponse;
+import response.UserLocationHistoryResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +24,10 @@ import java.util.List;
 import java.util.Random;
 
 import classes.User;
+import classes.AnsweredQuizz;
 import classes.Location;
 import classes.Question;
+import classes.Quizz;
 
 public class CommandHandlerImpl implements CommandHandler {
 
@@ -29,6 +35,8 @@ public class CommandHandlerImpl implements CommandHandler {
 	ArrayList<String> available_codes;//codes generated for the users tickets
 	ArrayList<Location> locations;
 	HashMap<String, ArrayList<Question>> globalQuestions; 
+	ArrayList<Quizz> quizzes;
+	ArrayList<AnsweredQuizz> answeredQuizzes;
 	
 	CommandHandlerImpl(){
 		users=new ArrayList<User>();
@@ -36,7 +44,8 @@ public class CommandHandlerImpl implements CommandHandler {
 		locations = new ArrayList<Location>();
 		addLocations();
 		addCodes();
-
+		answeredQuizzes=new ArrayList<AnsweredQuizz>();
+		quizzes = new ArrayList<Quizz>();
 		globalQuestions = new HashMap<String, ArrayList<Question>>();
 		setGlobalQuestions();
 	}
@@ -71,16 +80,39 @@ public class CommandHandlerImpl implements CommandHandler {
 		return new RegisterResponse("Register: Registered with success!",true);
 		
 	}
+	public AnsweredQuizz findAnsweredQuizz(String location){
+		for(AnsweredQuizz q: answeredQuizzes){
+			if(q.getLocation().equals(location))
+				return q;
+		}
+		return null;
+	}
 	
+	public Quizz findQuizz(String location){
+		for(Quizz q: quizzes){
+			if(q.getLocation().equals(location))
+				return q;
+		}
+		return null;
+	}
 	@Override
 	public Response handle(AnswersCommand ac){
 		System.out.println("Received: Answers Command");
 		
 		String location = ac.getLocation();
+		AnsweredQuizz answeredQuizz = findAnsweredQuizz(location);
+		if(answeredQuizz ==null){
+			answeredQuizz=new AnsweredQuizz(location);
+			answeredQuizzes.add(answeredQuizz);
+		}
 		ArrayList<Question> questions = globalQuestions.get(location);
 		ArrayList<Boolean> answersResult = new ArrayList<Boolean>();
 		ArrayList<Integer> answers = ac.getAnswers();
+
+		answeredQuizz.addUserAnswers(ac.getUserName(), answers);
 		
+		User u = findUser(ac.getUserName());
+		u.addAnsweredQuizz(findQuizz(location));
 		System.out.println("Questions size: " + questions.size());
 		System.out.println("Ans size: " + answers.size());
 		
@@ -92,7 +124,8 @@ public class CommandHandlerImpl implements CommandHandler {
 
 			answersResult.add(result);
 		}
-		
+
+		answeredQuizz.addUserResult(ac.getUserName(), answersResult);
 		return new AnswersResponse(answersResult);
 	}
 
@@ -102,8 +135,9 @@ public class CommandHandlerImpl implements CommandHandler {
 		String location = qc.getLocation();
 
 		ArrayList<Question> questions = globalQuestions.get(location);	//Get questions for that location
-
-		return new GetQuestionsResponse(questionsToClient(questions));
+		if(questions==null || questions.size()<1)
+			return new GetQuestionsResponse(null,false);
+		return new GetQuestionsResponse(questionsToClient(questions),true);
 	}
 
 	public User findUser(String username){
@@ -140,24 +174,63 @@ public class CommandHandlerImpl implements CommandHandler {
 
 	@Override
 	public Response handle(GetLocationsCommand c) {
-		return new GetLocationsResponse(locations);
+		return new GetLocationsResponse(locations,true);
 	}
-
+	
+	@Override
+	public Response handle(UserHistoryCommand c) {
+		System.out.println("Received History Command");
+		User u = findUser(c.getUsername());
+		if(u==null)
+			return new UserHistoryResponse(null,false);
+		ArrayList<Location> userLocations=new ArrayList<Location>();
+		for(String s: u.getAnsweredLocations())
+			userLocations.add(findLocation(s));
+		return new UserHistoryResponse(userLocations,true);
+	}
+	
+	public Location findLocation(String name){
+		for(Location l: locations){
+			if(l.getName().equals(name))
+				return l;
+		}
+		return null;
+	}
 	//Set HardCoded Questions
 	public void setGlobalQuestions(){
 		Question q1 = new Question();
-		q1.setQuestion("What is Ricardo's last name?");
-		q1.setAnswer1("Trindade");
-		q1.setAnswer2("Kovalchuk");
-		q1.setAnswer3("Quintino");
-		q1.setAnswer4("Xavier");
+		q1.setQuestion("What is Ricardo's last name?1");
+		q1.setAnswer1("Trindade1");
+		q1.setAnswer2("Kovalchuk1");
+		q1.setAnswer3("Quintino1");
+		q1.setAnswer4("Xavier1");
 		q1.setCorrectAnswer(4);
 
 		ArrayList<Question> questions = new ArrayList<Question>();
 		questions.add(q1);
-		questions.add(q1);
-		questions.add(q1);
-
+		
+		Question q2 = new Question();
+		q2.setQuestion("2What is Ricardo's last name?2");
+		q2.setAnswer1("Trindade2");
+		q2.setAnswer2("Kovalchuk2");
+		q2.setAnswer3("Quintino2");
+		q2.setAnswer4("Xavier2");
+		q2.setCorrectAnswer(4);
+		
+		questions.add(q2);
+		
+		Question q3 = new Question();
+		q3.setQuestion("3What is Ricardo's last name?3");
+		q3.setAnswer1("Trindade3");
+		q3.setAnswer2("Kovalchuk3");
+		q3.setAnswer3("Quintino3");
+		q3.setAnswer4("Xavier3");
+		q3.setCorrectAnswer(4);
+		
+		questions.add(q3);
+		System.out.println(questions.get(0).getQuestion()+questions.get(1).getQuestion());
+		
+		quizzes.add(new Quizz("belem tower",questions));
 		globalQuestions.put("belem tower", questions);
 	}
 
@@ -171,5 +244,13 @@ public class CommandHandlerImpl implements CommandHandler {
 		}
 
 		return clientQuestions;
+	}
+	@Override
+	public Response handle(UserLocationHistoryCommand c) {
+		AnsweredQuizz answeredQuizz = findAnsweredQuizz(c.getLocation());
+		Quizz quizz = findQuizz(c.getLocation());
+		if(answeredQuizz==null || quizz ==null)
+			return null;
+		return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
 	}
 }

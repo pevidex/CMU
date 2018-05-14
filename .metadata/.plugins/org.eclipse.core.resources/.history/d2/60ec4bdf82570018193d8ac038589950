@@ -1,0 +1,14 @@
+package classes;
+
+import java.util.ArrayList;
+import java.util.Map;
+
+public class AnsweredQuizz {
+	Quizz quizz;
+	Map<User,ArrayList<Integer>> answers;
+	public AnsweredQuizz(Quizz q){
+		quizz=q;
+		answers=new HashMap<User, A>
+	}
+	public void addUserAnswers(User u, ArrayList<Integer> a){answers.(user,a);}
+}
