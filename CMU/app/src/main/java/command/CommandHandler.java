@@ -9,4 +9,5 @@ public interface CommandHandler {
     public Response handle(GetQuestionsCommand c);
     public Response handle(AnswersCommand c);
     public Response handle(UserHistoryCommand c);
+    public Response handle(UserLocationHistoryCommand c);
 }

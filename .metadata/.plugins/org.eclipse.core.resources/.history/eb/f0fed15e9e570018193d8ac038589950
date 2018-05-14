@@ -1,0 +1,21 @@
+package response;
+
+import java.util.ArrayList;
+
+import classes.Question;
+
+public class UserLocationHistoryResponse implements Response {
+
+    private static final long serialVersionUID = 734423234276534155L;
+    private ArrayList<Question> questions;
+    private ArrayList<Boolean> answersResult;
+
+    public UserLocationHistoryResponse(ArrayList<Question> questions) {
+        this.questions = questions;
+    }
+    
+    public ArrayList<String> getMessage() {
+        return this.locations;
+    }
+}
+

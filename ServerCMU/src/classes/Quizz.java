@@ -8,6 +8,7 @@ public class Quizz {
 	private String location;
 	
 	public Quizz(String location, ArrayList<Question> questions){
+		this.location=location;
 		this.questions=questions;
 	}
 	

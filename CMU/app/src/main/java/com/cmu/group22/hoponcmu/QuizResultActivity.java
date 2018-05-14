@@ -1,19 +1,22 @@
 package com.cmu.group22.hoponcmu;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.cmu.group22.hoponcmu.Task.UserLocationHistoryTask;
+
 public class QuizResultActivity extends AppCompatActivity {
     private String currentLocation = null;
 
-
+    GlobalContext globalContext;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        int i=getIntent().getIntExtra("index_of_quiz",0);
-        Log.d("ATLAS",i+"");
+        globalContext = (GlobalContext) getApplicationContext();
+        String locationName=getIntent().getStringExtra("location");
+        new UserLocationHistoryTask(QuizResultActivity.this).execute(globalContext.getUserName(),locationName);
+        Log.d("ATLAS",locationName);
     }
 }

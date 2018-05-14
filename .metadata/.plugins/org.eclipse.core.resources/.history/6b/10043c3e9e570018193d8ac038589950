@@ -1,0 +1,18 @@
+package response;
+
+import java.util.ArrayList;
+
+public class UserLocationHistoryResponse implements Response {
+
+    private static final long serialVersionUID = 734423234276534155L;
+    private ArrayList<String> locations;
+
+    public UserLocationHistoryResponse(ArrayList<String> locations) {
+        this.locations = locations;
+    }
+    
+    public ArrayList<String> getMessage() {
+        return this.locations;
+    }
+}
+
