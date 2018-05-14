@@ -29,7 +29,6 @@ public class InitAnswers extends BaseAdapter{
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d("ATLAS","enter");
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(context.LAYOUT_INFLATER_SERVICE);
         View listView;
@@ -41,7 +40,6 @@ public class InitAnswers extends BaseAdapter{
 
         TextView textView = (TextView) listView.findViewById(R.id.AnswersResult_question);
         textView.setText(questions.get(position).getQuestion());
-        Log.d("ATLAS",questions.get(position).getQuestion());
 
         Button btn1 = (Button) listView.findViewById(R.id.AnswersResult_Btn_option1);
         btn1.setText(questions.get(position).getAnswer1());

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,9 @@ public class QuizResultActivity extends AppCompatActivity {
             return;
         }
         currentLocation = name_of_quiz;
+
+        TextView title = (TextView) findViewById(R.id.AnswerResultTItle);
+        title.setText(currentLocation);
 
         listView = (ListView) findViewById(R.id.AnswersResult);
 
