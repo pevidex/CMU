@@ -1,5 +1,6 @@
 package com.cmu.group22.hoponcmu;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
+import com.cmu.group22.hoponcmu.Task.SendAnswersTask;
 
 import classes.Answers;
 import classes.Question;
@@ -23,7 +25,6 @@ import java.util.List;
 public class CurrentQuizActivity extends AppCompatActivity {
     private String currentLocation = null;
     ListView listView;
-
     Button nextBtn;
     Button backBtn;
     int currentPos = 0;
@@ -31,12 +32,15 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     RadioGroup radioAnsGroup;
     ArrayList<Question> questions;
+    ArrayList<Boolean> answersResults = null;
+
+    GlobalContext globalContext;
 
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_currentquiz);
 
-        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        globalContext = (GlobalContext) getApplicationContext();
         ans = globalContext.getAnswers();
 
 
@@ -59,8 +63,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
         //ans = (Answers) getIntent().getSerializableExtra("stock_ans");
         ans.list();
         ans.init(questions);
-        ans.set(1,2);
-        ans.list();
         resetCurrentquiz();
 
 
@@ -103,8 +105,8 @@ public class CurrentQuizActivity extends AppCompatActivity {
                     if(currentPos == questions.size()){
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
-                        //TODO: to submit ans
-                        Log.d("ATLAS",ans.toString());
+                        ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
+                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
                         ans.clear();
                         return;
                     }
@@ -118,17 +120,26 @@ public class CurrentQuizActivity extends AppCompatActivity {
         }
     };
 
-
-
-
     protected void setCurrentLocation(String location){
         this.currentLocation = location;
     }
 
     public void updateQuestions(ArrayList<Question> questions){
-
         this.questions = questions;
-        Log.d("QUESTIONs",Integer.toString(questions.size()));
+    }
+
+    public void updateAnswers(ArrayList<Boolean> results){
+        Log.d("CurrentQuizzActivity: ", "Receiving update answers");
+        this.answersResults = results;
+
+        int correctAnswers = 0;
+
+        for(Boolean b : answersResults){
+            Log.d("CurrentQuizz", "" +b);
+            if(b) correctAnswers++;
+        }
+
+        Log.d("CurrentQuiz", "Number of correct answers: " + correctAnswers);
     }
 
     protected void resetCurrentquiz(){
@@ -184,6 +195,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
     public void updateInterface(String reply) {
         Toast.makeText(CurrentQuizActivity.this, reply,
                 Toast.LENGTH_LONG).show();
+    }
+
+    public void updateAnswersViews(){
+        //TODO Edit necessary views to display correct answers
     }
 
 }

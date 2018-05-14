@@ -21,7 +21,7 @@ public class LoginActivity extends AppCompatActivity {
         Button btLogin = (Button) findViewById(R.id.btLogin);
         TextView btRegister = (TextView) findViewById(R.id.btRegister);
 
-        GlobalContext globalContext = (GlobalContext) getApplicationContext();
+        final GlobalContext globalContext = (GlobalContext) getApplicationContext();
         globalContext.getSessionId();
 
 
@@ -35,6 +35,7 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 EditText userName = (EditText) findViewById(R.id.etUsername);
                 EditText code = (EditText) findViewById(R.id.etCode);
+                globalContext.setUserName(userName.getText().toString());
                 new LoginTask(LoginActivity.this).execute(userName.getText().toString(),code.getText().toString());
 
             }

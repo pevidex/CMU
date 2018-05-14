@@ -1,22 +1,28 @@
 package server;
 
+import command.AnswersCommand;
 import command.CommandHandler;
 import command.GetLocationsCommand;
 import command.GetQuestionsCommand;
 import command.LoginCommand;
 import command.RegisterCommand;
+import command.UserHistoryCommand;
+import response.AnswersResponse;
 import response.GetLocationsResponse;
 import response.GetQuestionsResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import response.Response;
+import response.UserHistoryResponse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import classes.User;
+import classes.AnsweredQuizz;
 import classes.Location;
 import classes.Question;
 import classes.Quizz;
@@ -28,6 +34,7 @@ public class CommandHandlerImpl implements CommandHandler {
 	ArrayList<Location> locations;
 	HashMap<String, ArrayList<Question>> globalQuestions; 
 	ArrayList<Quizz> quizzes;
+	ArrayList<AnsweredQuizz> answeredQuizzes;
 	
 	CommandHandlerImpl(){
 		users=new ArrayList<User>();
@@ -35,7 +42,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		locations = new ArrayList<Location>();
 		addLocations();
 		addCodes();
-		
+		answeredQuizzes=new ArrayList<AnsweredQuizz>();
 		quizzes = new ArrayList<Quizz>();
 		globalQuestions = new HashMap<String, ArrayList<Question>>();
 		setGlobalQuestions();
@@ -70,6 +77,52 @@ public class CommandHandlerImpl implements CommandHandler {
 		System.out.println("Register: User "+rc.getUsername()+" registered!\n");
 		return new RegisterResponse("Register: Registered with success!",true);
 		
+	}
+	public AnsweredQuizz findAnsweredQuizz(String location){
+		for(AnsweredQuizz q: answeredQuizzes){
+			if(q.getLocation().equals(location))
+				return q;
+		}
+		return null;
+	}
+	
+	public Quizz findQuizz(String location){
+		for(Quizz q: quizzes){
+			if(q.getLocation().equals(location))
+				return q;
+		}
+		return null;
+	}
+	@Override
+	public Response handle(AnswersCommand ac){
+		System.out.println("Received: Answers Command");
+		
+		String location = ac.getLocation();
+		AnsweredQuizz answeredQuizz = findAnsweredQuizz(location);
+		if(answeredQuizz ==null){
+			answeredQuizz=new AnsweredQuizz(location);
+		}
+		ArrayList<Question> questions = globalQuestions.get(location);
+		ArrayList<Boolean> answersResult = new ArrayList<Boolean>();
+		ArrayList<Integer> answers = ac.getAnswers();
+
+		answeredQuizz.addUserAnswers(ac.getUserName(), answers);
+		
+		User u = findUser(ac.getUserName());
+		u.addAnsweredQuizz(findQuizz(location));
+		System.out.println("Questions size: " + questions.size());
+		System.out.println("Ans size: " + answers.size());
+		
+		for(int i = 0; i < answers.size(); i++){
+			System.out.println(i);
+			int correctAnswer = questions.get(i).getCorrectAnswer();
+			Boolean result = correctAnswer == answers.get(i);
+			System.out.println("Answer="+ answers.get(i) + " Result="+ correctAnswer);
+
+			answersResult.add(result);
+		}
+		
+		return new AnswersResponse(answersResult);
 	}
 
 	@Override
@@ -119,6 +172,14 @@ public class CommandHandlerImpl implements CommandHandler {
 	public Response handle(GetLocationsCommand c) {
 		return new GetLocationsResponse(locations,true);
 	}
+	
+	@Override
+	public Response handle(UserHistoryCommand c) {
+		User u = findUser(c.getUsername());
+		if(u==null)
+			return new UserHistoryResponse(null,false);
+		return new UserHistoryResponse(u.getAnsweredLocations(),true);
+	}
 
 	//Set HardCoded Questions
 	public void setGlobalQuestions(){
@@ -128,7 +189,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		q1.setAnswer2("Kovalchuk");
 		q1.setAnswer3("Quintino");
 		q1.setAnswer4("Xavier");
-		q1.setCorrectAnswer("Xavier");
+		q1.setCorrectAnswer(4);
 
 		ArrayList<Question> questions = new ArrayList<Question>();
 		questions.add(q1);
