@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import classes.Location;
 
@@ -16,7 +17,7 @@ public class MyQuizActivity extends AppCompatActivity {
 
     ListView listView;
 
-    ArrayList<Location> locations=null;
+    List<Location> locations= new ArrayList<>();
 
 
     protected void onCreate(Bundle savedInstanceState){
@@ -32,11 +33,10 @@ public class MyQuizActivity extends AppCompatActivity {
 
     }
 
-    private void setMyquiz(ArrayList< Location > locations){
+    private void setMyquiz(List< Location > locations){
         //this.locations = locations;
 
         //for debug
-        locations = new ArrayList<>();
         locations.add(new Location("L1","res/123.jpg"));
         locations.add(new Location("L2","res/123.jpg"));
         locations.add(new Location("L3","res/123.jpg"));
@@ -51,7 +51,10 @@ public class MyQuizActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Intent intent = new Intent(view.getContext(), QuizResultActivity.class);
-            intent.putExtra("index_of_quiz",i);
+            //String name_of_quiz = locations.get(i).getName();
+            //Log.d("ATLAS",locations.size()+"");
+
+            intent.putExtra("name_of_quiz",locations.get(i).getName());
             startActivity(intent);
         }
     };
