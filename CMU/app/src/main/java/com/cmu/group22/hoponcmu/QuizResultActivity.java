@@ -26,7 +26,6 @@ public class QuizResultActivity extends AppCompatActivity {
     GlobalContext globalContext;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
         globalContext = (GlobalContext) getApplicationContext();
         setContentView(R.layout.activity_quizresult);
 
@@ -58,6 +57,14 @@ public class QuizResultActivity extends AppCompatActivity {
         questions.add(new Question("body3","c1","c2","c3","c4"));*/
         listView.setAdapter(new InitAnswers(this,this.questions));
 
+        listView = (ListView) findViewById(R.id.AnswersResult);
+
+        setMyAnswers(null);
+    }
+
+    private void setMyAnswers(List<Question> questionList) {
+        listView.setAdapter(new InitAnswers(this,questions));
+
 
 
     }
@@ -71,6 +78,5 @@ public class QuizResultActivity extends AppCompatActivity {
             this.userAnswers=userAnswers;
 
     }
-
 
 }

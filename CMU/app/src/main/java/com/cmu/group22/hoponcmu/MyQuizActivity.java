@@ -19,8 +19,7 @@ public class MyQuizActivity extends AppCompatActivity {
 
     ListView listView;
     GlobalContext globalContext;
-
-    List<Location> locations;
+    List<Location> locations= new ArrayList<>();
 
 
     protected void onCreate(Bundle savedInstanceState){
@@ -38,18 +37,6 @@ public class MyQuizActivity extends AppCompatActivity {
     }
 
     private void setMyquiz(List< Location > locations){
-        //this.locations = locations;
-
-        //for debug
-
-        /*locations.add(new Location("L1","res/123.jpg"));
-
-        locations.add(new Location("L1","res/123.jpg"));
-
-        locations.add(new Location("L2","res/123.jpg"));
-        locations.add(new Location("L3","res/123.jpg"));
-        locations.add(new Location("L4","res/123.jpg"));*/
-
         listView.setAdapter(new InitLocations(this,locations));
         listView.setOnItemClickListener(quizClickListener);
 
@@ -63,7 +50,6 @@ public class MyQuizActivity extends AppCompatActivity {
             //Log.d("ATLAS",locations.size()+"");
 
             intent.putExtra("name_of_quiz",locations.get(i).getName());
-
             startActivity(intent);
         }
     };
