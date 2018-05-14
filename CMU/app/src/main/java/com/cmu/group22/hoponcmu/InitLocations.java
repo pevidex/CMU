@@ -11,16 +11,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import classes.Location;
 
 public class InitLocations extends BaseAdapter {
     private Context context;
-    private final ArrayList<Location> locations;
+    private final List<Location> locations;
 
-    public InitLocations(Context context, ArrayList<Location> locations){
+    public InitLocations(Context context, List<Location> locations){
         this.context = context;
-        this.locations = locations;
+        this.locations = new ArrayList<>(locations);
     }
 
     public View getView(int position, View convertView, ViewGroup parent){

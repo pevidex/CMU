@@ -39,8 +39,8 @@ public class UserHistoryTask extends AsyncTask<String, Void, String> {
             this.locations = lr.getMessage();
             if(myQuizActivity==null)
                 Log.d("UserHistoryTask","step1");
-
-            myQuizActivity.updateLocations(this.locations);
+            if(this.locations!=null)
+                myQuizActivity.updateLocations(this.locations);
             Log.d("UserHistoryTask","Locations received");
             oos.close();
             ois.close();

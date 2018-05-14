@@ -39,13 +39,13 @@ public class UserLocationHistoryTask extends AsyncTask<String, Void, String> {
             if(quizResultActivity==null)
                 Log.d("UserLocationHistoryTask","activity-NULL");
 
-            quizResultActivity.updateInterface(lr.getQ);
+            quizResultActivity.updateInterface(lr.getQuestions(),lr.getAnswersResult(),lr.getUserAnswers());
             oos.close();
             ois.close();
             Log.d("UserLocationHistoryTask", "Hi there!!");
         }
         catch (Exception e) {
-            Log.d("UserHistoryTask", "DummyTask failed..." + e.getMessage());
+            Log.d("UserHistoryHistoryTask", "DummyTask failed..." + e.getMessage());
             e.printStackTrace();
         } finally {
             if (server != null) {
@@ -56,10 +56,10 @@ public class UserLocationHistoryTask extends AsyncTask<String, Void, String> {
         return reply;
     }
 
-    @Override
+   /* @Override
     protected void onPostExecute(String o) {
         if (o!=null) {
             quizResultActivity.updateInterface(o);
         }
-    }
+    }*/
 }

@@ -103,6 +103,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		AnsweredQuizz answeredQuizz = findAnsweredQuizz(location);
 		if(answeredQuizz ==null){
 			answeredQuizz=new AnsweredQuizz(location);
+			answeredQuizzes.add(answeredQuizz);
 		}
 		ArrayList<Question> questions = globalQuestions.get(location);
 		ArrayList<Boolean> answersResult = new ArrayList<Boolean>();
@@ -231,7 +232,6 @@ public class CommandHandlerImpl implements CommandHandler {
 		Quizz quizz = findQuizz(c.getLocation());
 		if(answeredQuizz==null || quizz ==null)
 			return null;
-		
 		return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
 	}
 }

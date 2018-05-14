@@ -46,8 +46,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
         setCurrentLocation(getIntent().getStringExtra("location"));
         GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
-        //error here because questions are not setup in time on task. need to wait for the task to complete
-
         try{
             String temp = g.get();}
         catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
