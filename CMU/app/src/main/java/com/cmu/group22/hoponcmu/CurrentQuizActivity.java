@@ -1,5 +1,6 @@
 package com.cmu.group22.hoponcmu;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -56,10 +57,6 @@ public class CurrentQuizActivity extends AppCompatActivity {
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
-        Log.d("ATLAS","questionsize"+questions.size());
-        Log.d("ATLAS","question1"+questions.get(0).getQuestion());
-        Log.d("ATLAS","question2"+questions.get(1).getQuestion());
-        Log.d("ATLAS","question3"+questions.get(2).getQuestion());
         ans.init(questions);
         resetCurrentquiz();
 
@@ -106,6 +103,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
                         new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
                         ans.clear();
+                        //redirect to the answer result list
+                        Intent intent = new Intent(v.getContext(),QuizResultActivity.class);
+                        intent.putExtra("name_of_quiz",currentLocation);
+                        startActivity(intent);
                         return;
                     }
                     break;

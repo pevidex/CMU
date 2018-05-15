@@ -48,9 +48,15 @@ public class QuizResultActivity extends AppCompatActivity {
 
         TextView title = (TextView) findViewById(R.id.AnswerResultTItle);
         title.setText(currentLocation);
+        //set the number of correct answers and the question the user have answered
+        //TODO: not sure it should be counted in server side or client side
+        TextView numberOfanswered = (TextView) findViewById(R.id.NumOfAnswered);
+        numberOfanswered.setText("you have answered ** questions");
+        TextView numberOfcorrect = (TextView) findViewById(R.id.NumOfCorrectAns);
+        numberOfcorrect.setText("and ** is correct!");
+        //TODO: the share button might be disabled or hidden when user arrives next monument
 
         listView = (ListView) findViewById(R.id.AnswersResult);
-        Log.d("ATLAS","start setadapter");
         listView.setAdapter(new InitAnswers(this,questions,userResult,userAnswers));
 
     }

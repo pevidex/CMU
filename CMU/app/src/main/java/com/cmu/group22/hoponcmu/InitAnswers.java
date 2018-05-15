@@ -71,10 +71,6 @@ public class InitAnswers extends BaseAdapter{
             option_i++;
         }
 
-
-        Log.d("ATLAS",userAnswers.get(position)+"");
-        Log.d("ATLAS","position:"+position+"answers"+userAnswers.get(position)+"");
-
         return listView;
     }
 

@@ -46,9 +46,6 @@ public class MyQuizActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             Intent intent = new Intent(view.getContext(), QuizResultActivity.class);
-            //String name_of_quiz = locations.get(i).getName();
-            //Log.d("ATLAS",locations.size()+"");
-
             intent.putExtra("name_of_quiz",locations.get(i).getName());
             startActivity(intent);
         }
