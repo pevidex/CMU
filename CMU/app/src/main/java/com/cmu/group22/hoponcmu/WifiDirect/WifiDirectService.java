@@ -18,10 +18,16 @@ import com.cmu.group22.hoponcmu.R;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import command.AnswersCommand;
+import command.Command;
+import command.CommandHandlerImpl;
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -31,6 +37,8 @@ import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
+import response.AnswersResponse;
+import response.Response;
 
 public class WifiDirectService extends Service implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener{
 
@@ -41,6 +49,7 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
     private boolean mBound = false;
     private SimWifiP2pSocketServer mSrvSocket = null;
     private SimWifiP2pSocket mCliSocket = null;
+    private CommandHandlerImpl handler;
 
     private SimWifiP2pBroadcastReceiver receiver;
     private Map<String, String> peersByName = new HashMap<String, String>();
@@ -52,6 +61,7 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
 
     public WifiDirectService(){
         instance = this;
+        handler = new CommandHandlerImpl();
     }
 
     public static WifiDirectService getInstance(){
@@ -175,12 +185,17 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
                     SimWifiP2pSocket sock = mSrvSocket.accept();
                     Log.d("WIFI-SERVICE", "Accept done");
                     try {
-                        BufferedReader sockIn = new BufferedReader(
-                                new InputStreamReader(sock.getInputStream()));
-                        String st = sockIn.readLine();
-                        Log.d("WIFI-SERVICE",  "Received " + st);
-                        publishProgress(st);
-                        sock.getOutputStream().write(("\n").getBytes());
+                        ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
+                        Command cmd = null;
+                        try {
+                            cmd = (Command) ois.readObject();
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        Response rsp = cmd.handle(handler);
+
+                        ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
+                        oos.writeObject(rsp);
                     } catch (IOException e) {
                         Log.d("Error reading socket:", e.getMessage());
                     } finally {
@@ -220,26 +235,52 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
         protected void onPostExecute(String result) {
         }
     }
+    public String sendAnswersToNative(ArrayList<Integer> answers, String location, String userName){
+        for (Map.Entry<String, String> entry : peersByName.entrySet()) {
+            if(entry.getKey().equals(monumentId)) continue;
+            if((Integer.parseInt(entry.getKey().substring(3)))%2!=0){
+                if ((new SendAnswersToNativeTask(answers, location, userName).execute(entry.getValue()).equals("ACK")))
+                    return "SUCCESS";
+                }
+        }
+        return "ERROR";
+    }
 
-    public class SendCommTask extends AsyncTask<String, String, Void> {
-
+    public class SendAnswersToNativeTask extends AsyncTask<String, String, String> {
+        private String location;
+        private String userName;
+        private ArrayList<Integer> answers;
+        public SendAnswersToNativeTask(ArrayList<Integer> answers, String location, String userName){
+            this.answers=answers;
+            this.location=location;
+            this.userName=userName;
+        }
         @Override
-        protected Void doInBackground(String... msg) {
+        protected String doInBackground(String[] params) {
             try {
-                mCliSocket.getOutputStream().write((msg[0] + "\n").getBytes());
-                BufferedReader sockIn = new BufferedReader(
-                        new InputStreamReader(mCliSocket.getInputStream()));
-                sockIn.readLine();
+                mCliSocket = new SimWifiP2pSocket(params[0],
+                        Integer.parseInt(getString(R.string.port)));
+                AnswersCommand ac =new AnswersCommand(location, answers,userName);
+                ObjectOutputStream oos = new ObjectOutputStream(mCliSocket.getOutputStream());
+                oos.writeObject(ac);
+                ObjectInputStream ois = new ObjectInputStream(mCliSocket.getInputStream());
+
+                AnswersResponse ar = null;
+                try {
+                    ar = (AnswersResponse) ois.readObject();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+                if(ar==null)
+                    Log.d("SendAnswersTask","lr null");
                 mCliSocket.close();
+                mCliSocket = null;
+                return "ACK";
             } catch (IOException e) {
                 e.printStackTrace();
             }
             mCliSocket = null;
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void result) {
         }
     }
 

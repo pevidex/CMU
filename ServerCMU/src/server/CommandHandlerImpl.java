@@ -59,6 +59,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		if(u.getCode().equals(lc.getCode())){
 			Random randomGenerator = new Random();
 			int sessionId = randomGenerator.nextInt(1000);
+			//TODO save sessionId on the user class
 			System.out.println("Login: User "+lc.getUsername()+" logged in!\n");
 			return new LoginResponse("Login: Success!",true, sessionId);
 		}
