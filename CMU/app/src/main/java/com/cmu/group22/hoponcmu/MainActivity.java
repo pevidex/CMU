@@ -80,7 +80,11 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(v.getContext(), CurrentQuizActivity.class);
 
-                intent.putExtra("location","belem tower");//need to know which location we're at
+
+                //CHECK IF DEVICE DETECTS WIFI MONUMENT
+                String currentLocation = getCurrentLocation();
+
+                intent.putExtra("location", currentLocation);//need to know which location we're at
 
                 startActivity(intent);
             }
@@ -123,5 +127,17 @@ public class MainActivity extends AppCompatActivity {
                 startService(i);
             }
         }.start();
+    }
+
+    public String getCurrentLocation(){
+        String currentLocation = "";
+        WifiDirectService wifiService;
+        if(WifiDirectService.isRunning()) {
+            wifiService = WifiDirectService.getInstance();
+            if (wifiService.isNearMonument()){
+                currentLocation = wifiService.getMonumentId();
+            }
+        }
+        return currentLocation;
     }
 }

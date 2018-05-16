@@ -45,6 +45,7 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
     private SimWifiP2pBroadcastReceiver receiver;
     private Map<String, String> peersByName = new HashMap<String, String>();
     private static WifiDirectService instance;
+
     private String myName;
 
     boolean nearMonument = false;
@@ -57,6 +58,8 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
     public static WifiDirectService getInstance(){
         return instance;
     }
+
+
 
     @Override
     public int onStartCommand(Intent t, int f, int sid){
@@ -248,4 +251,30 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
     public IBinder onBind(Intent intent) {
         return null;
     }
+
+
+    public boolean isNearMonument() {
+        return nearMonument;
+    }
+
+    public void setNearMonument(boolean nearMonument) {
+        this.nearMonument = nearMonument;
+    }
+
+    public String getMonumentId() {
+        return monumentId;
+    }
+
+    public void setMonumentId(String monumentId) {
+        this.monumentId = monumentId;
+    }
+
+    public String getMyName() {
+        return myName;
+    }
+
+    public void setMyName(String myName) {
+        this.myName = myName;
+    }
+
 }

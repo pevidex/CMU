@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
 import com.cmu.group22.hoponcmu.Task.SendAnswersTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 import classes.Answers;
 import classes.Question;
@@ -44,27 +45,52 @@ public class CurrentQuizActivity extends AppCompatActivity {
         globalContext = (GlobalContext) getApplicationContext();
         ans = globalContext.getAnswers();
 
-
-        setCurrentLocation(getIntent().getStringExtra("location"));
-        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
-        try{
-            String temp = g.get();}
-        catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
-
-        TextView title = (TextView) findViewById (R.id.QuizTitle);
-        title.setText(currentLocation);
-
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
-        ans.init(questions);
-        resetCurrentquiz();
+
+        radioAnsGroup.setVisibility(View.INVISIBLE);
+        nextBtn.setVisibility(View.INVISIBLE);
+        backBtn.setVisibility(View.INVISIBLE);
+
+        TextView title = (TextView) findViewById (R.id.QuizTitle);
+
+        setCurrentLocation(getIntent().getStringExtra("location"));
+
+        if(currentLocation.equals("") && globalContext.getQuizz().isEmpty()) {
+            //SET EVERYTHING TO INVISIBLE
+            radioAnsGroup.setVisibility(View.INVISIBLE);
+            nextBtn.setVisibility(View.INVISIBLE);
+            backBtn.setVisibility(View.INVISIBLE);
+
+            title.setText("TOO LATE TO DOWNLOAD QUIZZ");
+
+        }
+        else {
+            if(globalContext.getQuizz().isEmpty()) {
+                GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
+                try {
+                    String temp = g.get();
+                } catch (Exception e) {
+                    Log.d("DummyClient", "ERROR on get questions task");
+                }
+            }
+            else {
+                title.setText(currentLocation);
+
+                radioAnsGroup.setVisibility(View.VISIBLE);
+                nextBtn.setVisibility(View.VISIBLE);
+                backBtn.setVisibility(View.VISIBLE);
+
+                ans.init(questions);
+                resetCurrentquiz();
 
 
-        nextBtn.setOnClickListener(onClickListener);
-        backBtn.setOnClickListener(onClickListener);
+                nextBtn.setOnClickListener(onClickListener);
+                backBtn.setOnClickListener(onClickListener);
+            }
 
-
+        }
     }
 
     private OnClickListener onClickListener = new OnClickListener(){
@@ -101,8 +127,21 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
-                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
-                        ans.clear();
+
+                        WifiDirectService wservice;
+                        String myName;
+                        if(WifiDirectService.isRunning()) {
+                            wservice = WifiDirectService.getInstance();
+                            myName = wservice.getMyName();
+                            if((Integer.parseInt(myName) % 2) == 0) //FOREIGN USER
+                                WifiDirectService.SendAnswersToNative(answers, currentLocation, globalContext.getUserName());
+                            else   //NATIVE USER
+                                new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
+
+
+                        }
+
+                         ans.clear();
                         //redirect to the answer result list
                         Intent intent = new Intent(v.getContext(),QuizResultActivity.class);
                         intent.putExtra("name_of_quiz",currentLocation);
@@ -125,6 +164,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     public void updateQuestions(ArrayList<Question> questions){
         this.questions = questions;
+        globalContext.setQuizz(questions);
     }
 
     public void updateAnswers(ArrayList<Boolean> results){
