@@ -12,6 +12,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetLocationsTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 import java.util.ArrayList;
 
@@ -42,6 +43,15 @@ public class MainActivity extends AppCompatActivity {
         //TODO:check the cookie if the user has logged in. if not, go to login activity
         //Intent intent = new Intent(this, LoginActivity.class);
         //startActivity(intent);
+
+
+        //START WIFI DIRECT SERVICE
+        //Start WIFI DIRECT
+        if (WifiDirectService.isRunning()) {
+            stopService(new Intent(getBaseContext(), WifiDirectService.class));
+        }
+
+        startWifiService();
 
         //init the click actions about logout, current_quiz, my quiz, my message box
         btLogout = (Button) findViewById(R.id.Btn_logout);
@@ -103,5 +113,15 @@ public class MainActivity extends AppCompatActivity {
     public void updateInterface(String reply) {
         Toast.makeText(MainActivity.this, reply,
                 Toast.LENGTH_LONG).show();
+    }
+
+    public void startWifiService(){
+        new Thread() {
+            public void run() {
+                Log.d("WIFI-SERVICE", "STARTING INTENT");
+                Intent i = new Intent(getBaseContext(), WifiDirectService.class);
+                startService(i);
+            }
+        }.start();
     }
 }
