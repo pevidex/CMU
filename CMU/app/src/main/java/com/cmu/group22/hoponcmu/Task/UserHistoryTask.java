@@ -30,6 +30,7 @@ public class UserHistoryTask extends AsyncTask<String, Void, String> {
         Socket server = null;
         String reply = null;
         UserHistoryCommand glc = new UserHistoryCommand(params[0]);
+        Log.d("UserHistoryTask", "Name=" + glc.getUsername());
         try {
             server = new Socket("10.0.2.2", 9090);
             ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
@@ -37,6 +38,7 @@ public class UserHistoryTask extends AsyncTask<String, Void, String> {
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
             UserHistoryResponse lr = (UserHistoryResponse) ois.readObject();
             this.locations = lr.getMessage();
+            Log.d("UserHistoryTask", "LOCATIONS = " + this.locations);
             if(myQuizActivity==null)
                 Log.d("UserHistoryTask","step1");
             if(this.locations!=null)

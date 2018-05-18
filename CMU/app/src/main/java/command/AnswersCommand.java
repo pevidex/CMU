@@ -17,6 +17,7 @@ public class AnswersCommand implements Command {
     private String location; //To know which questions are these answers for.
     private ArrayList<Integer> answers;
     private String userName;
+    private long quizzTime;
 
     public String getUserName() {
         return userName;
@@ -30,11 +31,12 @@ public class AnswersCommand implements Command {
         answers = new ArrayList<Integer>();
     }
 
-    public AnswersCommand(String location, ArrayList<Integer> answers, String userName)
+    public AnswersCommand(String location, ArrayList<Integer> answers, String userName, long qt)
     {
         this.location = location;
         this.answers = answers;
         this.userName = userName;
+        this.quizzTime = qt;
     }
 
     public AnswersCommand(ArrayList<Integer> al) {
@@ -66,4 +68,11 @@ public class AnswersCommand implements Command {
         return chi.handle(this);
     }
 
+    public long getQuizzTime() {
+        return quizzTime;
+    }
+
+    public void setQuizzTime(long quizzTime) {
+        this.quizzTime = quizzTime;
+    }
 }

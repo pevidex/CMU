@@ -114,6 +114,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		
 		User u = findUser(ac.getUserName());
 		u.addAnsweredQuizz(findQuizz(location));
+		System.out.println("Added location=" + location + " to user=" + ac.getUserName());
 		System.out.println("Questions size: " + questions.size());
 		System.out.println("Ans size: " + answers.size());
 		
@@ -161,7 +162,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		locations.add(new Location("cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"));
 		locations.add(new Location("Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"));
 		locations.add(new Location("25 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"));
-		locations.add(new Location("belem tower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"));
+		locations.add(new Location("BelemTower","http://www.layoverguide.com/wp-content/uploads/2011/05/Belem-tower-in-Lisbon-Portugal.jpg"));
 		locations.add(new Location("cascais","http://nomanbefore.com/wp-content/uploads/2016/09/Cascais-41-e1476847968281-1024x767.jpg"));
 		locations.add(new Location("Rossio Square","https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Pra%C3%A7a_de_D._Pedro_IV.jpg/360px-Pra%C3%A7a_de_D._Pedro_IV.jpg"));
 		locations.add(new Location("25 de Abril Bridge","https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Ponte_25_de_Abril_Lisboa.jpg/330px-Ponte_25_de_Abril_Lisboa.jpg"));
@@ -185,8 +186,10 @@ public class CommandHandlerImpl implements CommandHandler {
 		if(u==null)
 			return new UserHistoryResponse(null,false);
 		ArrayList<Location> userLocations=new ArrayList<Location>();
-		for(String s: u.getAnsweredLocations())
+		for(String s: u.getAnsweredLocations()){
 			userLocations.add(findLocation(s));
+			System.out.println("UserHistory.Sending " + s);
+		}
 		return new UserHistoryResponse(userLocations,true);
 	}
 	
@@ -231,8 +234,8 @@ public class CommandHandlerImpl implements CommandHandler {
 		questions.add(q3);
 		System.out.println(questions.get(0).getQuestion()+questions.get(1).getQuestion());
 		
-		quizzes.add(new Quizz("belem tower",questions));
-		globalQuestions.put("belem tower", questions);
+		quizzes.add(new Quizz("BelemTower",questions));
+		globalQuestions.put("BelemTower", questions);
 	}
 
 	//Translate serverQuestions to clientQuestions (without correctAnswer)

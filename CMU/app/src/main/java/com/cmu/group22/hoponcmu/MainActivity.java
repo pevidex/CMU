@@ -2,6 +2,7 @@ package com.cmu.group22.hoponcmu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.cmu.group22.hoponcmu.Task.GetLocationsTask;
 import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import classes.Answers;
 import classes.Location;
@@ -45,14 +47,6 @@ public class MainActivity extends AppCompatActivity {
         //startActivity(intent);
 
 
-        //START WIFI DIRECT SERVICE
-        //Start WIFI DIRECT
-        if (WifiDirectService.isRunning()) {
-            stopService(new Intent(getBaseContext(), WifiDirectService.class));
-        }
-
-        startWifiService();
-
         //init the click actions about logout, current_quiz, my quiz, my message box
         btLogout = (Button) findViewById(R.id.Btn_logout);
         img_currentquiz = (ImageView) findViewById(R.id.imageView_currentquiz);
@@ -67,9 +61,9 @@ public class MainActivity extends AppCompatActivity {
                 globalContext.setSessionId(CLEAR_SESSION);
                 Intent intent = new Intent(v.getContext(), LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
-
         //Get Locations From Server
         new GetLocationsTask(MainActivity.this).execute();
 
@@ -100,13 +94,18 @@ public class MainActivity extends AppCompatActivity {
         img_msgbox.setClickable(true);
         img_msgbox.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), LoginActivity.class);//TODO:change me
+                Intent intent = new Intent(v.getContext(), RankingActivity.class);
                 startActivity(intent);
             }
         });
 
         //TODO: maybe there should be some click actions on locations?
 
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        //TODO
     }
     public void updateLocations(ArrayList<Location> locations){
         this.locations=locations;
@@ -119,24 +118,14 @@ public class MainActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
 
-    public void startWifiService(){
-        new Thread() {
-            public void run() {
-                Log.d("WIFI-SERVICE", "STARTING INTENT");
-                Intent i = new Intent(getBaseContext(), WifiDirectService.class);
-                startService(i);
-            }
-        }.start();
-    }
 
     public String getCurrentLocation(){
         String currentLocation = "";
         WifiDirectService wifiService;
         if(WifiDirectService.isRunning()) {
             wifiService = WifiDirectService.getInstance();
-            if (wifiService.isNearMonument()){
-                currentLocation = wifiService.getMonumentId();
-            }
+            currentLocation = wifiService.getMonumentId();
+
         }
         return currentLocation;
     }

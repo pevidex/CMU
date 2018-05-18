@@ -29,7 +29,7 @@ public class MyQuizActivity extends AppCompatActivity {
         globalContext = (GlobalContext) getApplicationContext();
         listView = (ListView) findViewById(R.id.listView_myquiz);
         new UserHistoryTask(MyQuizActivity.this).execute(globalContext.getUserName());
-        setMyquiz(locations);
+
 
     }
     public void test(){
@@ -53,10 +53,10 @@ public class MyQuizActivity extends AppCompatActivity {
     public void updateInterface(String reply) {
     }
     public void updateLocations(ArrayList<Location> locations){
-
+        Log.d("MyQuizActivity", "LOCATIONS SIZE = " + locations.size());
+        Log.d("MyQuizActivity", "LOCATIONS = " + locations);
         this.locations=locations;
-        //init the list of locations
-        listView.setAdapter(new InitLocations(this, locations));
+        setMyquiz(locations);
     }
 }
 

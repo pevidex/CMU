@@ -1,37 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cmu.group22.hoponcmu"
-    xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.cmu.group22.hoponcmu">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".GlobalContext"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name="com.cmu.group22.hoponcmu.GlobalContext"
         tools:replace="android:icon">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" />
+        <activity android:name=".CurrentQuizActivity" />
+        <activity android:name=".RegisterActivity" />
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CurrentQuizActivity"></activity>
-        <activity android:name=".RegisterActivity"></activity>
-        <activity android:name=".LoginActivity">
-        </activity>
-        <activity android:name=".QuizResultActivity"></activity>
-        <activity android:name=".MyQuizActivity"></activity>
-        <service
-            android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
+        <activity android:name=".QuizResultActivity" />
+        <activity android:name=".MyQuizActivity" />
+
+        <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
         <service
             android:name=".WifiDirect.WifiDirectService"
             android:enabled="true"
             android:exported="false" />
+
+        <activity android:name=".QuizSubmitActivity" />
+        <activity android:name=".RankingActivity"></activity>
     </application>
+
 </manifest>

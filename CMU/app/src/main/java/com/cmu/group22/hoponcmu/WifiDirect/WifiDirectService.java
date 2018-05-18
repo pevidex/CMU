@@ -13,6 +13,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 
+import com.cmu.group22.hoponcmu.CurrentQuizActivity;
+import com.cmu.group22.hoponcmu.GlobalContext;
+import com.cmu.group22.hoponcmu.QuizSubmitActivity;
 import com.cmu.group22.hoponcmu.R;
 
 import java.io.BufferedReader;
@@ -25,9 +28,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import classes.Question;
 import command.AnswersCommand;
 import command.Command;
 import command.CommandHandlerImpl;
+import command.ShareCommand;
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
@@ -59,10 +64,10 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
 
     boolean nearMonument = false;
     String monumentId = "";
+    GlobalContext globalContext;
 
     public WifiDirectService(){
         instance = this;
-        handler = new CommandHandlerImpl();
     }
 
     public static WifiDirectService getInstance(){
@@ -78,16 +83,25 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
         Intent intent = new Intent(getBaseContext(), SimWifiP2pService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
         mBound = true;
+        globalContext = (GlobalContext) getApplicationContext();
+        handler = new CommandHandlerImpl(globalContext);
 
         Log.d("WIFI-SERVICE", "INITIALIZED");
         // spawn the chat server background task
         new IncommingCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
-        return super.onStartCommand(t, f, sid);
+        return Service.START_STICKY;
     }
 
     @Override
     public void onDestroy() {
+        if(mBound){
+            Log.d("WIFI-SERVICE","INSIDE BOUND");
+            unbindService(mConnection);
+            mBound=false;
+            unregisterReceiver(receiver);
+        }
+        instance=null;
         Log.d("WIFI-SERVICE", "Service Destroyed");
     }
 
@@ -136,12 +150,12 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
     public void onPeersAvailable(SimWifiP2pDeviceList deviceList) {
 
         nearMonument = false;
-        monumentId = "";
 
         for (SimWifiP2pDevice device : deviceList.getDeviceList()) {
             if(device.deviceName.startsWith("M")) {
                 nearMonument = true;
                 monumentId = device.deviceName.substring(1);
+                globalContext.setQuizz(new ArrayList<Question>()); //CLEAR OLD MONUMENT QUESTIONS
             }
         }
 
@@ -167,6 +181,7 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
             mService = null;
             mManager = null;
             mChannel = null;
+            mBound = false;
         }
     };
 
@@ -186,7 +201,6 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     SimWifiP2pSocket sock = mSrvSocket.accept();
-                    Log.d("WIFI-SERVICE", "Accept done");
                     try {
                         ObjectInputStream ois = new ObjectInputStream(sock.getInputStream());
                         Command cmd = null;
@@ -196,6 +210,7 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
                             e.printStackTrace();
                         }
                         Response rsp = cmd.handle(handler);
+                        Log.d("WIFI-SERVICE", "Received Communication");
 
                         ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                         oos.writeObject(rsp);
@@ -238,13 +253,22 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
         protected void onPostExecute(String result) {
         }
     }
-    public String sendAnswersToNative(ArrayList<Integer> answers, String location, String userName){
+    public String sendAnswersToNative(CurrentQuizActivity c, ArrayList<Integer> answers, String location, String userName, long quizzTime){
         for (Map.Entry<String, String> entry : peersByName.entrySet()) {
-            if(entry.getKey().equals(monumentId)) continue;
-            if((Integer.parseInt(entry.getKey().substring(3)))%2!=0){
-                if ((new SendAnswersToNativeTask(answers, location, userName).execute(entry.getValue()).equals("ACK")))
-                    return "SUCCESS";
+            if(entry.getKey().startsWith("M")) continue;
+            if((Integer.parseInt(entry.getKey().substring(4)))%2 ==0) {
+                Log.d("WIFI-SERVICE", "sending answers to neighbor");
+                SendAnswersToNativeTask s = (SendAnswersToNativeTask) new SendAnswersToNativeTask(c, answers, location, userName, quizzTime).execute(entry.getValue());
+                try {
+                    String temp = s.get();
+                    Log.d("WIFI-DIRECT", "Task Result = " + temp);
+                    if (temp.equals("ACK"))
+                        return "SUCCESS";
+                } catch (Exception e) {
+                    Log.d("CurrentActivity", "task error");
                 }
+            }
+
         }
         return "ERROR";
     }
@@ -253,19 +277,24 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
         private String location;
         private String userName;
         private ArrayList<Integer> answers;
-        public SendAnswersToNativeTask(ArrayList<Integer> answers, String location, String userName){
+        private CurrentQuizActivity currentQuizActivity;
+        long quizzTime;
+        public SendAnswersToNativeTask(CurrentQuizActivity c, ArrayList<Integer> answers, String location, String userName, long qt){
             this.answers=answers;
             this.location=location;
             this.userName=userName;
+            this.currentQuizActivity=c;
+            this.quizzTime = qt;
         }
         @Override
         protected String doInBackground(String[] params) {
             try {
                 mCliSocket = new SimWifiP2pSocket(params[0],
                         Integer.parseInt(getString(R.string.port)));
-                AnswersCommand ac =new AnswersCommand(location, answers,userName);
+                AnswersCommand ac =new AnswersCommand(location, answers,userName, quizzTime);
                 ObjectOutputStream oos = new ObjectOutputStream(mCliSocket.getOutputStream());
                 oos.writeObject(ac);
+                Log.d("WIFI-SERVICE", "Sent Answers");
                 ObjectInputStream ois = new ObjectInputStream(mCliSocket.getInputStream());
 
                 AnswersResponse ar = null;
@@ -275,7 +304,8 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
                     e.printStackTrace();
                 }
                 if(ar==null)
-                    Log.d("SendAnswersTask","lr null");
+                    Log.d("SendAnswersTask","ar null");
+                currentQuizActivity.updateAnswers(ar.getAnswersResult());
                 mCliSocket.close();
                 mCliSocket = null;
                 return "ACK";
@@ -285,7 +315,54 @@ public class WifiDirectService extends Service implements SimWifiP2pManager.Peer
             mCliSocket = null;
             return null;
         }
+
     }
+
+    public void shareResults(QuizSubmitActivity c, int numCorrectAnswers, String location, String userName, long quizzTime){
+        for (Map.Entry<String, String> entry : peersByName.entrySet()) {
+            Log.d("WIFI-SERVICE", "Sharing answer with " + entry.getKey());
+            new ShareResultsTask(c, numCorrectAnswers, location, userName, quizzTime).execute(entry.getValue());
+        }
+    }
+
+    public class ShareResultsTask extends AsyncTask<String, String, String> {
+        private String location;
+        private String userName;
+        int correctAnswers;
+        private QuizSubmitActivity quizSubmitActivity;
+        private long quizzTime;
+        public ShareResultsTask(QuizSubmitActivity c, int r , String location, String userName, long qt){
+            this.correctAnswers = r;
+            this.location=location;
+            this.userName=userName;
+            this.quizSubmitActivity=c;
+            this.quizzTime = qt;
+        }
+
+        @Override
+        protected String doInBackground(String[] params) {
+            try {
+                mCliSocket = new SimWifiP2pSocket(params[0],
+                        Integer.parseInt(getString(R.string.port)));
+                ShareCommand sc = new ShareCommand(userName, location, correctAnswers, 4, quizzTime);
+                ObjectOutputStream oos = new ObjectOutputStream(mCliSocket.getOutputStream());
+                oos.writeObject(sc);
+                Log.d("WIFI-SERVICE", "Sent share!");
+                ObjectInputStream ois = new ObjectInputStream(mCliSocket.getInputStream());
+
+                mCliSocket.close();
+                mCliSocket = null;
+                return "ACK";
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mCliSocket = null;
+            return null;
+        }
+
+    }
+
+
 
     @Nullable
     @Override

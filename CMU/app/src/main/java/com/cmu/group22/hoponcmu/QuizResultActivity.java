@@ -14,6 +14,7 @@ import java.util.List;
 import classes.Question;
 
 import com.cmu.group22.hoponcmu.Task.UserLocationHistoryTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 public class QuizResultActivity extends AppCompatActivity {
 
@@ -40,8 +41,18 @@ public class QuizResultActivity extends AppCompatActivity {
         }else{
             return;
         }
-        currentLocation = name_of_quiz;
+
+        //Get Termite Info
+        WifiDirectService wservice;
+        boolean isNearMonument = false;
+        if(WifiDirectService.isRunning()) {
+            wservice = WifiDirectService.getInstance();
+            currentLocation = wservice.getMonumentId();
+            isNearMonument = wservice.isNearMonument();
+        }
+
         UserLocationHistoryTask u = (UserLocationHistoryTask) new UserLocationHistoryTask(QuizResultActivity.this).execute(globalContext.getUserName(),name_of_quiz);
+
         try{
             String temp = u.get();}
         catch(Exception e){Log.d("QuizResultActivity","task error");}

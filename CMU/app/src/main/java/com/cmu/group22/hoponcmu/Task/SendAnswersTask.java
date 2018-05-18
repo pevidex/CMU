@@ -26,12 +26,14 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
     ArrayList<Integer> answers;
     String location;
     String userName;
+    long quizzTime;
 
-    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l, String userName) {
+    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l, String userName, long qt) {
         this.currentQuizActivity = currentQuizActivity;
         this.answers = a;
         this.location = l;
         this.userName= userName;
+        this.quizzTime = qt;
     }
 
 
@@ -41,7 +43,7 @@ public class SendAnswersTask extends AsyncTask<String, Void, String> {
         String reply = null;
         //ResponseHandlerImpl handler = new ResponseHandlerImpl();
         Log.d("SendAnswersTask", "Answer's Size: " + answers.size());
-        AnswersCommand ac = new AnswersCommand(location, answers,userName);
+        AnswersCommand ac = new AnswersCommand(location, answers,userName, quizzTime);
 
         try {
             server = new Socket("10.0.2.2", 9090);
