@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import classes.Answers;
 
@@ -21,11 +22,11 @@ public class GlobalContext extends Application {
 
 
 
-    private SecretKey secretKey;
+    private SecretKeySpec secretKey;
 
-    public void setSecretKey(SecretKey SK) { this.secretKey = SK; }
+    public void setSecretKey(SecretKeySpec SK) { this.secretKey = SK; }
 
-    public SecretKey getSecretKey() {
+    public SecretKeySpec getSecretKey() {
         return secretKey;
     }
 

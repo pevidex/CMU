@@ -13,7 +13,7 @@ import response.Response;
 import response.ResponseData;
 import security.CryptoManager;
 
-public class AgreeSecretKeyCommand implements Command{
+public class AgreeSecretKeyCommand implements Commands{
 
     public byte[] getEncryptedSK() {
         return encryptedSK;
@@ -25,8 +25,4 @@ public class AgreeSecretKeyCommand implements Command{
 
     }
 
-    @Override
-    public Response handle(CommandHandler ch) {
-        return null;
-    }
 }

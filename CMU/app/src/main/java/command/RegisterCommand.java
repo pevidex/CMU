@@ -3,7 +3,7 @@ package command;
 import response.Response;
 import response.ResponseData;
 
-public class RegisterCommand implements Command {
+public class RegisterCommand implements Commands {
 
     private static final long serialVersionUID = -8807331723807741905L;
     private String username;
@@ -13,12 +13,6 @@ public class RegisterCommand implements Command {
         this.code = code;
         this.username = username;
     }
-
-    @Override
-    public Response handle(CommandHandler chi) {
-        return chi.handle(this);
-    }
-
 
     public String getUsername() {
         return username;

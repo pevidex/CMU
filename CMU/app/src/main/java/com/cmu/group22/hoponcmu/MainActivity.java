@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         //Get Locations From Server
-        new GetLocationsTask(MainActivity.this).execute();
+        new GetLocationsTask(MainActivity.this, globalContext).execute();
 
         img_currentquiz.setClickable(true);//TODO:according to the detect of wifi to define whether the user can answer now also should consider about whether the user has answered this question
         img_currentquiz.setOnClickListener(new View.OnClickListener() {

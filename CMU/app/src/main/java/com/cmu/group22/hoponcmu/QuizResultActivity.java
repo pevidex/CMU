@@ -41,7 +41,7 @@ public class QuizResultActivity extends AppCompatActivity {
             return;
         }
         currentLocation = name_of_quiz;
-        UserLocationHistoryTask u = (UserLocationHistoryTask) new UserLocationHistoryTask(QuizResultActivity.this).execute(globalContext.getUserName(),name_of_quiz);
+        UserLocationHistoryTask u = (UserLocationHistoryTask) new UserLocationHistoryTask(QuizResultActivity.this, globalContext).execute(globalContext.getUserName(),name_of_quiz);
         try{
             String temp = u.get();}
         catch(Exception e){Log.d("QuizResultActivity","task error");}

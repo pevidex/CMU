@@ -3,7 +3,7 @@ package command;
 import response.Response;
 import response.ResponseData;
 
-public class UserLocationHistoryCommand implements Command {
+public class UserLocationHistoryCommand implements Commands {
 
     private static final long serialVersionUID = 2331723807741905L;
     private String username;
@@ -14,10 +14,6 @@ public class UserLocationHistoryCommand implements Command {
         this.location=location;
     }
 
-    @Override
-    public Response handle(CommandHandler chi) {
-        return chi.handle(this);
-    }
 
     public String getLocation() {
         return location;

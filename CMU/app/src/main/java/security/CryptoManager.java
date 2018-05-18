@@ -3,6 +3,7 @@ package security;
 import android.util.Base64;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -24,10 +25,9 @@ public class CryptoManager {
 
     final private static String AS_ALOGROTHIM = "RSA/ECB/PKCS1Padding";
 
-    public static SecretKey generateSK() throws NoSuchPaddingException, NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-        keyGenerator.init(128);
-        SecretKey secretKey = keyGenerator.generateKey();
+    public static SecretKeySpec generateSK() throws NoSuchPaddingException, NoSuchAlgorithmException, UnsupportedEncodingException {
+        String passkey = "qwe123098poifsdf";
+        SecretKeySpec secretKey = new SecretKeySpec(passkey.getBytes("UTF-8"),"AES");
         return secretKey;
     }
 
@@ -86,7 +86,7 @@ public class CryptoManager {
         return encrypted;
     }
 
-    public static SecretKey revertSK(byte[] toDecrypt, byte[] keyBytes) throws NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException {
+    public static SecretKeySpec revertSK(byte[] toDecrypt, byte[] keyBytes) throws NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException {
 
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -97,7 +97,7 @@ public class CryptoManager {
 
         cipher.init(Cipher.DECRYPT_MODE, prikey);
         byte[] decrypted = cipher.doFinal(toDecrypt);
-        SecretKey secretKey = new SecretKeySpec(decrypted, 0,
+        SecretKeySpec secretKey = new SecretKeySpec(decrypted, 0,
                 decrypted.length, "AES");
         return secretKey;
     }

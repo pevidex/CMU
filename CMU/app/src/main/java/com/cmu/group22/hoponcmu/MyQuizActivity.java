@@ -28,7 +28,7 @@ public class MyQuizActivity extends AppCompatActivity {
         locations= new ArrayList<Location>();
         globalContext = (GlobalContext) getApplicationContext();
         listView = (ListView) findViewById(R.id.listView_myquiz);
-        new UserHistoryTask(MyQuizActivity.this).execute(globalContext.getUserName());
+        new UserHistoryTask(MyQuizActivity.this,globalContext).execute(globalContext.getUserName());
         setMyquiz(locations);
 
     }

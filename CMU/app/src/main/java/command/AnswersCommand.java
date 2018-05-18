@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import response.Response;
 import response.ResponseData;
 
-public class AnswersCommand implements Command {
+public class AnswersCommand implements Commands {
 
     private static final long serialVersionUID = -8907331723807741905L;
 
@@ -56,9 +56,6 @@ public class AnswersCommand implements Command {
         this.location = location;
     }
 
-    @Override
-    public Response handle(CommandHandler chi) {
-        return chi.handle(this);
-    }
+
 
 }

@@ -5,13 +5,13 @@ import response.Response;
 import response.ResponseData;
 
 public interface CommandHandler {
-    public Response handle(LoginCommand c);
-    public Response handle(RegisterCommand c);
-    public Response handle(GetLocationsCommand c);
-    public Response handle(GetQuestionsCommand c);
-    public Response handle(AnswersCommand c);
-    public Response handle(UserHistoryCommand c);
-    public Response handle(UserLocationHistoryCommand c);
-    
-    public Response handle(Request request);
+    public ResponseData handle(LoginCommand c);
+    public ResponseData handle(GetLocationsCommand c);
+    public ResponseData handle(GetQuestionsCommand c);
+    public ResponseData handle(AnswersCommand c);
+    public ResponseData handle(UserHistoryCommand c);
+    public ResponseData handle(UserLocationHistoryCommand c);
+	public ResponseData handle(RegisterCommand rc);
+	
+	public Response handle(Request request);
 }

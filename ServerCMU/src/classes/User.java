@@ -1,12 +1,17 @@
 package classes;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
+
+import javax.crypto.spec.SecretKeySpec;
 
 public class User {
 	
 	String username;
 	String code;
 	ArrayList<Quizz> answeredQuizzes;
+	PublicKey userPbk;
+	SecretKeySpec UserSessionKey;
 	
 	public User(String u, String c){
 		username=u;

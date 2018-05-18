@@ -79,7 +79,7 @@ public class CryptoManager {
         return encrypted;
     }
 
-    public static SecretKey revertSK(byte[] toDecrypt, PrivateKey prikey) throws NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException {
+    public static SecretKeySpec revertSK(byte[] toDecrypt, PrivateKey prikey) throws NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, IllegalBlockSizeException, InvalidKeyException, NoSuchPaddingException {
 
         Cipher cipher = null;
         cipher = Cipher.getInstance(AS_ALOGROTHIM);
@@ -88,7 +88,7 @@ public class CryptoManager {
         byte[] decrypted = cipher.doFinal(toDecrypt);
         
         
-        SecretKey secretKey = new SecretKeySpec(decrypted, 0,
+        SecretKeySpec secretKey = new SecretKeySpec(decrypted, 0,
                 decrypted.length, "AES");
         return secretKey;
     }

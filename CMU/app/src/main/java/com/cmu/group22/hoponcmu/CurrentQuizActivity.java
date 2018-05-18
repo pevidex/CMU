@@ -47,7 +47,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
 
         setCurrentLocation(getIntent().getStringExtra("location"));
-        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this).execute(currentLocation);
+        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this, globalContext).execute(currentLocation);
         try{
             String temp = g.get();}
         catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
@@ -106,7 +106,7 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         long endTime = SystemClock.elapsedRealtime();
 
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
-                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
+                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName(),globalContext).execute();
                         ans.clear();
                         //redirect to the answer result list
                         Intent intent = new Intent(v.getContext(),QuizResultActivity.class);

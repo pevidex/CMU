@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cmu.group22.hoponcmu.Task.KeyAgreeTask;
 import com.cmu.group22.hoponcmu.Task.RegisterTask;
 
 
@@ -32,6 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
                 EditText userName = (EditText) findViewById(R.id.etUsername);
                 EditText code = (EditText) findViewById(R.id.etCode);
                 globalContext.setUserName(userName.getText().toString());
+                new KeyAgreeTask(RegisterActivity.this,globalContext).execute(userName.getText().toString(),code.getText().toString());
                 new RegisterTask(RegisterActivity.this,globalContext).execute(userName.getText().toString(),code.getText().toString());
             }
         });

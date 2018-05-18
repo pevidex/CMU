@@ -29,6 +29,7 @@ import security.SignKeypair;
 import security.SignedObject;
 
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -46,6 +47,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import classes.User;
 import classes.AnsweredQuizz;
@@ -61,11 +63,12 @@ public class CommandHandlerImpl implements CommandHandler {
 	HashMap<String, ArrayList<Question>> globalQuestions; 
 	ArrayList<Quizz> quizzes;
 	ArrayList<AnsweredQuizz> answeredQuizzes;
-	PrivateKey serverPrk;
-	PrivateKey signPrk;
-	HashMap<PublicKey,SecretKey> userSessionKeyMap = new HashMap<>();
+	PrivateKey serverPrk;//use for crypto
+	PrivateKey signPrk;//use for sign
+	HashMap<PublicKey,SecretKeySpec> userSessionKeyMap; 
 	
 	CommandHandlerImpl(){
+		userSessionKeyMap = new HashMap<>();
 		users=new ArrayList<User>();
 		available_codes = new ArrayList<String>();
 		locations = new ArrayList<Location>();
@@ -106,13 +109,17 @@ public class CommandHandlerImpl implements CommandHandler {
 	
 	public Response handle(Request request) {
 		System.out.println("receive request");
-		SecretKey secretKey = null;
+		SecretKeySpec secretKey = null;
+		ResponseData responseData = null;
 		Response response = null;
+		PublicKey userPbk = null; 
 		byte[]  userPbkBytes = null;
+		
+		
 		try {
 			
 			userPbkBytes = request.getPubkeyBytes();
-			PublicKey userPbk;
+			
 			userPbk = CryptoManager.getPbkFromBytes(userPbkBytes,"DSA");
 			
 			if(request instanceof KeyAgreeRequest) {
@@ -125,6 +132,8 @@ public class CommandHandlerImpl implements CommandHandler {
 						byte[] encryptedSK = akeyc.getEncryptedSK();
 						secretKey = CryptoManager.revertSK(encryptedSK, serverPrk);
 						userSessionKeyMap.put(userPbk, secretKey);
+						
+						responseData = new SecretKeyResponse();
 					}else {
 						System.out.println("not agree secret command");
 						return null;
@@ -136,79 +145,90 @@ public class CommandHandlerImpl implements CommandHandler {
 			}else if(request instanceof NormalRequest) {
 				request = (NormalRequest) request;
 				EncryptedObject o = ((NormalRequest) request).getEncryptedObject();
-				SignedObject signedO = o.decrypt(userSessionKeyMap.get(userPbk));
+				SecretKeySpec sessionKey = userSessionKeyMap.get(userPbk);
+				SignedObject signedO = o.decrypt(sessionKey);
 				if(signedO.verify(userPbkBytes)) {
 					if(signedO.getObject() instanceof RegisterCommand) {
 						System.out.println("register command");
-						return handle((RegisterCommand)signedO.getObject());
-						
+						responseData = handle((RegisterCommand)signedO.getObject());												
 					}else if(signedO.getObject() instanceof AnswersCommand) {
-						
-					}//......
-				}else {
+						responseData = handle((AnswersCommand) signedO.getObject());
+					}else if(signedO.getObject() instanceof GetLocationsCommand) {
+						responseData = handle((GetLocationsCommand) signedO.getObject());
+					}else if(signedO.getObject() instanceof LoginCommand) {
+						responseData = handle((LoginCommand) signedO.getObject());
+					}else if(signedO.getObject() instanceof UserLocationHistoryCommand) {
+						responseData = handle((UserLocationHistoryCommand)signedO.getObject());
+					}else if(signedO.getObject() instanceof UserHistoryCommand) {
+						responseData = handle((UserHistoryCommand) signedO.getObject());
+					}else if(signedO.getObject() instanceof GetQuestionsCommand) {
+						responseData = handle((GetQuestionsCommand) signedO.getObject());
+					}
+				}else {  
 					System.out.println("verify fails - normal request");
 					return null;
 				}
 			}
 			
-		} catch (InvalidKeySpecException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | ClassNotFoundException | IOException | SignatureException e1) {
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | ClassNotFoundException | IOException | SignatureException | InvalidAlgorithmParameterException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		
 		//return response
-		SecretKeyResponse responsedata = new SecretKeyResponse();
+		SecretKeySpec sessionKey = userSessionKeyMap.get(userPbk);
 		try {
-			SignedObject responseSigned = new SignedObject(responsedata, signPrk);
-			EncryptedObject responseEncrypted = new EncryptedObject(responseSigned, secretKey);
+			SignedObject responseSigned = new SignedObject(responseData, signPrk);
+			EncryptedObject responseEncrypted = new EncryptedObject(responseSigned, sessionKey);
 			response = new Response(responseEncrypted);
 		}
 		catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException
-					| IllegalBlockSizeException|IOException e) {
+					| IllegalBlockSizeException|IOException | InvalidAlgorithmParameterException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 		
 		} 
-		
-		System.out.println("success");
+
 		return response;
 	}
 	
 	@Override
-	public Response handle(LoginCommand lc) {
+	public ResponseData handle(LoginCommand lc) {
+		ResponseData responseData;
+		SignedObject responseSigned;
 		System.out.println("Received: LogIn Command");
 		User u = findUser(lc.getUsername());
 		if(u==null)
-			return null;
-			//return new LoginResponse("Login: invalid Username!",false, -1);
+		
+			return new LoginResponse("Login: invalid Username!",false, -1);
 		if(u.getCode().equals(lc.getCode())){
 			Random randomGenerator = new Random();
 			int sessionId = randomGenerator.nextInt(1000);
 			System.out.println("Login: User "+lc.getUsername()+" logged in!\n");
-			return null;
-			//return new LoginResponse("Login: Success!",true, sessionId);
+			return new LoginResponse("Login: Success!",true, sessionId);
 		}
-		return null;
-		//return new LoginResponse("Login: invalid code",false, -1);
+		
+		return new LoginResponse("Login: invalid code",false, -1);
 	}
+	
 	@Override
-	public Response handle(RegisterCommand rc) {
+	public ResponseData handle(RegisterCommand rc) {
 		System.out.println("Received: Register Command");
 		User u = findUser(rc.getUsername());
 		String c = findCode(rc.getCode());
 		
 		if(u!=null)
-			return null;
-			//return new RegisterResponse("Register: Username already exists!",false);
+			
+			return new RegisterResponse("Register: Username already exists!",false);
 		if(c==null)
-			return null;
-			//return new RegisterResponse("Register: Invalid Code!",false);
+			
+			return new RegisterResponse("Register: Invalid Code!",false);
 		User newU = new User(rc.getUsername(),c);
 		users.add(newU);
 		available_codes.remove(c); //can remove like this?
 		System.out.println("Register: User "+rc.getUsername()+" registered!\n");
-		return null;
-		//return new RegisterResponse("Register: Registered with success!",true);
+		
+		return new RegisterResponse("Register: Registered with success!",true);
 		
 	}
 	public AnsweredQuizz findAnsweredQuizz(String location){
@@ -226,8 +246,9 @@ public class CommandHandlerImpl implements CommandHandler {
 		}
 		return null;
 	}
+	
 	@Override
-	public Response handle(AnswersCommand ac){
+	public ResponseData handle(AnswersCommand ac){
 		System.out.println("Received: Answers Command");
 		
 		String location = ac.getLocation();
@@ -257,21 +278,18 @@ public class CommandHandlerImpl implements CommandHandler {
 		}
 
 		answeredQuizz.addUserResult(ac.getUserName(), answersResult);
-		return null;
-		//return new AnswersResponse(answersResult);
+		return new AnswersResponse(answersResult);
 	}
 
 	@Override
-	public Response handle(GetQuestionsCommand qc){
+	public ResponseData handle(GetQuestionsCommand qc){
 		System.out.println("Received: Questions Command");
 		String location = qc.getLocation();
 
 		ArrayList<Question> questions = globalQuestions.get(location);	//Get questions for that location
-		if(questions==null || questions.size()<1)
-			return null;
-			//return new GetQuestionsResponse(null,false);
-		return null;
-		//return new GetQuestionsResponse(questionsToClient(questions),true);
+		if(questions==null || questions.size()<1)			
+			return new GetQuestionsResponse(null,false);
+		return new GetQuestionsResponse(questionsToClient(questions),true);
 	}
 
 	public User findUser(String username){
@@ -306,24 +324,19 @@ public class CommandHandlerImpl implements CommandHandler {
 		available_codes.addAll(Arrays.asList(codesList));
 	}
 
-	@Override
-	public Response handle(GetLocationsCommand c) {
-		return null;
-		//return new GetLocationsResponse(locations,true);
+	public ResponseData handle(GetLocationsCommand c) {
+		return new GetLocationsResponse(locations,true);
 	}
 	
-	@Override
-	public Response handle(UserHistoryCommand c) {
+	public ResponseData handle(UserHistoryCommand c) {
 		System.out.println("Received History Command");
 		User u = findUser(c.getUsername());
 		if(u==null)
-			return null;
-			//return new UserHistoryResponse(null,false);
+			return new UserHistoryResponse(null,false);
 		ArrayList<Location> userLocations=new ArrayList<Location>();
 		for(String s: u.getAnsweredLocations())
 			userLocations.add(findLocation(s));
-		return null;
-		//return new UserHistoryResponse(userLocations,true);
+		return new UserHistoryResponse(userLocations,true);
 	}
 	
 	public Location findLocation(String name){
@@ -383,12 +396,12 @@ public class CommandHandlerImpl implements CommandHandler {
 		return clientQuestions;
 	}
 	@Override
-	public Response handle(UserLocationHistoryCommand c) {
+	public ResponseData handle(UserLocationHistoryCommand c) {
 		AnsweredQuizz answeredQuizz = findAnsweredQuizz(c.getLocation());
 		Quizz quizz = findQuizz(c.getLocation());
 		if(answeredQuizz==null || quizz ==null)
 			return null;
-		return null;
-		//return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
+		
+		return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
 	}
 }

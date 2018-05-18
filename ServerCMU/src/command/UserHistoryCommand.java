@@ -3,7 +3,7 @@ package command;
 import response.Response;
 import response.ResponseData;
 
-public class UserHistoryCommand implements Command {
+public class UserHistoryCommand implements Commands {
 
     private static final long serialVersionUID = 2331723807741905L;
     private String username;
@@ -12,10 +12,7 @@ public class UserHistoryCommand implements Command {
         this.username = username;
     }
 
-    @Override
-    public Response handle(CommandHandler chi) {
-        return chi.handle(this);
-    }
+
 
 
     public String getUsername() {
