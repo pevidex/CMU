@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class AnswersResponse implements Response {
+public class AnswersResponse implements ResponseData {
 
     private static final long serialVersionUID = 735457624276534179L;
 

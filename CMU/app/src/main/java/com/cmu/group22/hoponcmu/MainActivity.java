@@ -13,10 +13,20 @@ import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetLocationsTask;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Provider;
+import java.security.Security;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 
-import classes.Answers;
 import classes.Location;
+import command.RegisterCommand;
+import security.SignKeypair;
+import security.SignedObject;
 
 public class MainActivity extends AppCompatActivity {
     ListView listView;
@@ -43,6 +53,48 @@ public class MainActivity extends AppCompatActivity {
         //Intent intent = new Intent(this, LoginActivity.class);
         //startActivity(intent);
 
+        //debug
+        // List all security providers
+        for (Provider p : Security.getProviders()) {
+            Log.d("provider", String.format("== %s ==", p.getName()));
+            for (Provider.Service s : p.getServices()) {
+                Log.d("provider", String.format("- %s", s.getAlgorithm()));
+            }
+        }
+//        try {
+//            SignKeypair  signKeypair = new SignKeypair();
+//            RegisterCommand lc = new RegisterCommand("code","name", signKeypair.getSignPbkBytes());
+//            SignedObject lc_signed= new SignedObject(lc, signKeypair);
+//            RegisterCommand deser_lc = (RegisterCommand) lc_signed.getObject();
+//            Log.d("debug",deser_lc.getUsername());
+//
+//            if(lc_signed.verify(deser_lc.getPubkey()))
+//                Log.d("debug","success");
+//
+//            //SecretKey sk = globalContext.getSecretKey();
+//            //EncryptedObject pack = new EncryptedObject(lc_signed, sk);
+//            //Log.d("debug2",((RegisterCommand) pack.decrypt(sk).getObject()).getUsername());
+//
+//
+//        } catch (NoSuchProviderException e) {
+//            Log.d("errorx",e.getMessage());
+//        } catch (IOException e) {
+//            Log.d("errorx",e.getMessage());
+//        } catch (ClassNotFoundException e) {
+//            Log.d("errorx",e.getMessage());
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//            Log.d("errorx",e.getMessage());
+//        } catch (SignatureException e) {
+//            Log.d("errorx",e.getMessage());
+//            e.printStackTrace();
+//        } catch (InvalidKeyException e) {
+//            Log.d("errorx",e.getMessage());
+//            e.printStackTrace();
+//        } catch (InvalidKeySpecException e) {
+//            Log.d("errorx",e.getMessage());
+//            e.printStackTrace();
+//        }
         //init the click actions about logout, current_quiz, my quiz, my message box
         btLogout = (Button) findViewById(R.id.Btn_logout);
         img_currentquiz = (ImageView) findViewById(R.id.imageView_currentquiz);

@@ -1,5 +1,8 @@
 package command;
 
+
+import request.Request;
+import response.ResponseData;
 import response.Response;
 
 public interface CommandHandler {
@@ -10,4 +13,6 @@ public interface CommandHandler {
     public Response handle(AnswersCommand c);
     public Response handle(UserHistoryCommand c);
     public Response handle(UserLocationHistoryCommand c);
+
+    public Response handle(Request request);
 }

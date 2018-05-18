@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import classes.Location;
 
-public class UserHistoryResponse implements Response {
+public class UserHistoryResponse implements ResponseData {
 
     private static final long serialVersionUID = 734423324276534155L;
     private ArrayList<Location> locations;

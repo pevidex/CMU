@@ -1,6 +1,8 @@
 package com.cmu.group22.hoponcmu;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.Image;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,10 +42,12 @@ public class InitLocations extends BaseAdapter {
 
         TextView textView = (TextView) listView.findViewById(R.id.grid_locations_label);
         textView.setText(locations.get(position).getName());
-        ImageView imageView = (ImageView) listView.findViewById(R.id.grid_locations_image);
+//        ImageView imageView = (ImageView) listView.findViewById(R.id.grid_locations_image);
+
+
         //int imageId = context.getResources().getIdentifier(locationItems[position][1], null, context.getPackageName());
         //imageView.setImageResource(imageId);
-        imageView.setImageResource(R.drawable.home_icon);//TODO:fix me
+        //imageView.setImageResource(R.drawable.home_icon);//TODO:fix me
 
         return listView;
     }

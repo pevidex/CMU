@@ -13,14 +13,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name="com.cmu.group22.hoponcmu.GlobalContext">
-        <activity android:name=".MainActivity">
+        <activity android:name=".RegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".CurrentQuizActivity"></activity>
-        <activity android:name=".RegisterActivity"></activity>
+        <activity android:name=".MainActivity"></activity>
         <activity android:name=".LoginActivity">
         </activity>
         <activity android:name=".QuizResultActivity"></activity>

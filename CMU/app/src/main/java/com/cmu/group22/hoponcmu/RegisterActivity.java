@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.RegisterTask;
 
+
 public class RegisterActivity extends AppCompatActivity {
     GlobalContext globalContext;
     @Override
@@ -31,7 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
                 EditText userName = (EditText) findViewById(R.id.etUsername);
                 EditText code = (EditText) findViewById(R.id.etCode);
                 globalContext.setUserName(userName.getText().toString());
-                new RegisterTask(RegisterActivity.this).execute(userName.getText().toString(),code.getText().toString());
+                new RegisterTask(RegisterActivity.this,globalContext).execute(userName.getText().toString(),code.getText().toString());
             }
         });
     }
@@ -40,8 +41,10 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.LENGTH_LONG).show();
     }
     public void nextActivity(){
+
         Intent myIntent = new Intent(this, MainActivity.class);
         startActivity(myIntent);
         finish();
     }
+
 }

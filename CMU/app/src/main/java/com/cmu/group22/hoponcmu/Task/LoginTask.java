@@ -35,6 +35,8 @@ public class LoginTask extends AsyncTask<String, Void, String> {
             ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
 
             LoginResponse lr = (LoginResponse) ois.readObject();
+
+
             reply = lr.getMessage();
             if(lr.getSuccess()) {//change this to use a handler
                 GlobalContext globalContext = (GlobalContext) loginActivity.getApplicationContext();

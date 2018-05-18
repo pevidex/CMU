@@ -3,6 +3,7 @@ package com.cmu.group22.hoponcmu;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -100,6 +101,10 @@ public class CurrentQuizActivity extends AppCompatActivity {
                     if(currentPos == questions.size()){
                         nextBtn.setEnabled(false);
                         backBtn.setEnabled(false);
+
+                        //send the time elapsed to server(start time should be the moment that the user start quizz? or the quizz is published?
+                        long endTime = SystemClock.elapsedRealtime();
+
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
                         new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName()).execute();
                         ans.clear();

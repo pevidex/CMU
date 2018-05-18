@@ -1,6 +1,6 @@
 package response;
 
-public class LoginResponse implements Response {
+public class LoginResponse implements ResponseData {
 
     private static final long serialVersionUID = 734457624276534179L;
     private String message;

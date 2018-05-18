@@ -10,7 +10,7 @@ public class Question implements QuestionInterface{
 	String question;
 	List<String> answers = new ArrayList<>();
 	int correctAnswer;//the index of options
-	final private int NO_SET = -1;
+	final private int NO_SET = 0;
 
 
 	public Question(String q, String a1, String a2, String a3, String a4, int ca){

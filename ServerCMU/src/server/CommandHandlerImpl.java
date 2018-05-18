@@ -1,5 +1,6 @@
 package server;
 
+import command.AgreeSecretKeyCommand;
 import command.AnswersCommand;
 import command.CommandHandler;
 import command.GetLocationsCommand;
@@ -8,20 +9,43 @@ import command.LoginCommand;
 import command.RegisterCommand;
 import command.UserHistoryCommand;
 import command.UserLocationHistoryCommand;
+import request.Request;
+import request.KeyAgreeRequest;
+import request.NormalRequest;
 import response.AnswersResponse;
 import response.GetLocationsResponse;
 import response.GetQuestionsResponse;
 import response.LoginResponse;
 import response.RegisterResponse;
 import response.Response;
+import response.ResponseData;
+import response.SecretKeyResponse;
 import response.UserHistoryResponse;
 import response.UserLocationHistoryResponse;
+import security.CryptoManager;
+import security.EncryptedObject;
+import security.GenerateKeys;
+import security.SignKeypair;
+import security.SignedObject;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import classes.User;
 import classes.AnsweredQuizz;
@@ -37,6 +61,9 @@ public class CommandHandlerImpl implements CommandHandler {
 	HashMap<String, ArrayList<Question>> globalQuestions; 
 	ArrayList<Quizz> quizzes;
 	ArrayList<AnsweredQuizz> answeredQuizzes;
+	PrivateKey serverPrk;
+	PrivateKey signPrk;
+	HashMap<PublicKey,SecretKey> userSessionKeyMap = new HashMap<>();
 	
 	CommandHandlerImpl(){
 		users=new ArrayList<User>();
@@ -47,7 +74,104 @@ public class CommandHandlerImpl implements CommandHandler {
 		answeredQuizzes=new ArrayList<AnsweredQuizz>();
 		quizzes = new ArrayList<Quizz>();
 		globalQuestions = new HashMap<String, ArrayList<Question>>();
+		
 		setGlobalQuestions();
+		
+		GenerateKeys gk;
+		try {
+			gk = new GenerateKeys(1024);
+			serverPrk =  gk.getPrivate("KeyPair/privateKey");
+		} catch (NoSuchAlgorithmException | NoSuchProviderException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			SignKeypair sgk = new SignKeypair();
+			//signPrk = null;
+			signPrk = sgk.getPrivate("KeyPair/signPrk");
+		} catch (NoSuchProviderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
+	}
+	
+	public Response handle(Request request) {
+		System.out.println("receive request");
+		SecretKey secretKey = null;
+		Response response = null;
+		byte[]  userPbkBytes = null;
+		try {
+			
+			userPbkBytes = request.getPubkeyBytes();
+			PublicKey userPbk;
+			userPbk = CryptoManager.getPbkFromBytes(userPbkBytes,"DSA");
+			
+			if(request instanceof KeyAgreeRequest) {
+				request = (KeyAgreeRequest) request;
+				SignedObject o = ((KeyAgreeRequest) request).getSignedObject();
+				if(o.verify(userPbkBytes)) {
+					Object obj = o.getObject();
+					if(obj instanceof AgreeSecretKeyCommand) {
+						AgreeSecretKeyCommand akeyc = (AgreeSecretKeyCommand) obj;
+						byte[] encryptedSK = akeyc.getEncryptedSK();
+						secretKey = CryptoManager.revertSK(encryptedSK, serverPrk);
+						userSessionKeyMap.put(userPbk, secretKey);
+					}else {
+						System.out.println("not agree secret command");
+						return null;
+					}
+				}else {
+					System.out.println("verify fails - keyagree request");
+					return null;
+				}
+			}else if(request instanceof NormalRequest) {
+				request = (NormalRequest) request;
+				EncryptedObject o = ((NormalRequest) request).getEncryptedObject();
+				SignedObject signedO = o.decrypt(userSessionKeyMap.get(userPbk));
+				if(signedO.verify(userPbkBytes)) {
+					if(signedO.getObject() instanceof RegisterCommand) {
+						System.out.println("register command");
+						return handle((RegisterCommand)signedO.getObject());
+						
+					}else if(signedO.getObject() instanceof AnswersCommand) {
+						
+					}//......
+				}else {
+					System.out.println("verify fails - normal request");
+					return null;
+				}
+			}
+			
+		} catch (InvalidKeySpecException | NoSuchAlgorithmException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException | NoSuchPaddingException | ClassNotFoundException | IOException | SignatureException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//return response
+		SecretKeyResponse responsedata = new SecretKeyResponse();
+		try {
+			SignedObject responseSigned = new SignedObject(responsedata, signPrk);
+			EncryptedObject responseEncrypted = new EncryptedObject(responseSigned, secretKey);
+			response = new Response(responseEncrypted);
+		}
+		catch (InvalidKeyException | NoSuchPaddingException | NoSuchAlgorithmException | BadPaddingException
+					| IllegalBlockSizeException|IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+		
+		} 
+		
+		System.out.println("success");
+		return response;
 	}
 	
 	@Override
@@ -55,29 +179,36 @@ public class CommandHandlerImpl implements CommandHandler {
 		System.out.println("Received: LogIn Command");
 		User u = findUser(lc.getUsername());
 		if(u==null)
-			return new LoginResponse("Login: invalid Username!",false, -1);
+			return null;
+			//return new LoginResponse("Login: invalid Username!",false, -1);
 		if(u.getCode().equals(lc.getCode())){
 			Random randomGenerator = new Random();
 			int sessionId = randomGenerator.nextInt(1000);
 			System.out.println("Login: User "+lc.getUsername()+" logged in!\n");
-			return new LoginResponse("Login: Success!",true, sessionId);
+			return null;
+			//return new LoginResponse("Login: Success!",true, sessionId);
 		}
-		return new LoginResponse("Login: invalid code",false, -1);
+		return null;
+		//return new LoginResponse("Login: invalid code",false, -1);
 	}
 	@Override
 	public Response handle(RegisterCommand rc) {
 		System.out.println("Received: Register Command");
 		User u = findUser(rc.getUsername());
 		String c = findCode(rc.getCode());
+		
 		if(u!=null)
-			return new RegisterResponse("Register: Username already exists!",false);
+			return null;
+			//return new RegisterResponse("Register: Username already exists!",false);
 		if(c==null)
-			return new RegisterResponse("Register: Invalid Code!",false);
+			return null;
+			//return new RegisterResponse("Register: Invalid Code!",false);
 		User newU = new User(rc.getUsername(),c);
 		users.add(newU);
 		available_codes.remove(c); //can remove like this?
 		System.out.println("Register: User "+rc.getUsername()+" registered!\n");
-		return new RegisterResponse("Register: Registered with success!",true);
+		return null;
+		//return new RegisterResponse("Register: Registered with success!",true);
 		
 	}
 	public AnsweredQuizz findAnsweredQuizz(String location){
@@ -126,7 +257,8 @@ public class CommandHandlerImpl implements CommandHandler {
 		}
 
 		answeredQuizz.addUserResult(ac.getUserName(), answersResult);
-		return new AnswersResponse(answersResult);
+		return null;
+		//return new AnswersResponse(answersResult);
 	}
 
 	@Override
@@ -136,8 +268,10 @@ public class CommandHandlerImpl implements CommandHandler {
 
 		ArrayList<Question> questions = globalQuestions.get(location);	//Get questions for that location
 		if(questions==null || questions.size()<1)
-			return new GetQuestionsResponse(null,false);
-		return new GetQuestionsResponse(questionsToClient(questions),true);
+			return null;
+			//return new GetQuestionsResponse(null,false);
+		return null;
+		//return new GetQuestionsResponse(questionsToClient(questions),true);
 	}
 
 	public User findUser(String username){
@@ -174,7 +308,8 @@ public class CommandHandlerImpl implements CommandHandler {
 
 	@Override
 	public Response handle(GetLocationsCommand c) {
-		return new GetLocationsResponse(locations,true);
+		return null;
+		//return new GetLocationsResponse(locations,true);
 	}
 	
 	@Override
@@ -182,11 +317,13 @@ public class CommandHandlerImpl implements CommandHandler {
 		System.out.println("Received History Command");
 		User u = findUser(c.getUsername());
 		if(u==null)
-			return new UserHistoryResponse(null,false);
+			return null;
+			//return new UserHistoryResponse(null,false);
 		ArrayList<Location> userLocations=new ArrayList<Location>();
 		for(String s: u.getAnsweredLocations())
 			userLocations.add(findLocation(s));
-		return new UserHistoryResponse(userLocations,true);
+		return null;
+		//return new UserHistoryResponse(userLocations,true);
 	}
 	
 	public Location findLocation(String name){
@@ -251,6 +388,7 @@ public class CommandHandlerImpl implements CommandHandler {
 		Quizz quizz = findQuizz(c.getLocation());
 		if(answeredQuizz==null || quizz ==null)
 			return null;
-		return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
+		return null;
+		//return new UserLocationHistoryResponse(quizz.getQuestions(),answeredQuizz.getUserResult(c.getUsername()),answeredQuizz.getUserAnswers(c.getUsername()));
 	}
 }

@@ -1,6 +1,6 @@
 package response;
 
-public class RegisterResponse implements Response {
+public class RegisterResponse implements ResponseData {
 
     private static final long serialVersionUID = 734457624276534179L;
     private String message;

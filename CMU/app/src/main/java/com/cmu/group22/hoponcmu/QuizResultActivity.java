@@ -48,12 +48,24 @@ public class QuizResultActivity extends AppCompatActivity {
 
         TextView title = (TextView) findViewById(R.id.AnswerResultTItle);
         title.setText(currentLocation);
-        //set the number of correct answers and the question the user have answered
-        //TODO: not sure it should be counted in server side or client side
+
+        //not sure it should be counted in server side or client side
         TextView numberOfanswered = (TextView) findViewById(R.id.NumOfAnswered);
-        numberOfanswered.setText("you have answered ** questions");
+        int numOfAnswered = 0;
+        for(int userAns : userAnswers){
+            if(userAns>0)
+                numOfAnswered++;
+
+        }
+        numberOfanswered.setText("you have answered "+numOfAnswered+" questions");
+        int numOfCorrect = 0;
+        for(boolean ifCorrect : userResult){
+            if(ifCorrect)
+                numOfCorrect++;
+        }
         TextView numberOfcorrect = (TextView) findViewById(R.id.NumOfCorrectAns);
-        numberOfcorrect.setText("and ** is correct!");
+        numberOfcorrect.setText("and "+numOfCorrect+" is correct!");
+
         //TODO: the share button might be disabled or hidden when user arrives next monument
 
         listView = (ListView) findViewById(R.id.AnswersResult);

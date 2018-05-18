@@ -1,16 +1,21 @@
 package command;
 
+import java.security.PublicKey;
+
 import response.Response;
+import response.ResponseData;
 
 public class RegisterCommand implements Command {
 
     private static final long serialVersionUID = -8807331723807741905L;
     private String username;
     private String code;
+    private byte[] pubbkey;
 
-    public RegisterCommand(String code, String username) {
+    public RegisterCommand(String code, String username, byte[] pbkBytes) {
         this.code = code;
         this.username = username;
+        this.pubbkey = pbkBytes;
     }
 
     @Override
@@ -33,6 +38,10 @@ public class RegisterCommand implements Command {
 
     public void setCode(String code) {
         this.code = code;
+    }
+    
+    public byte[] getPubkey() {
+    	return pubbkey;
     }
 
 }

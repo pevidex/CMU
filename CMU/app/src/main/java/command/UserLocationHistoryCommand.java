@@ -1,6 +1,7 @@
 package command;
 
 import response.Response;
+import response.ResponseData;
 
 public class UserLocationHistoryCommand implements Command {
 

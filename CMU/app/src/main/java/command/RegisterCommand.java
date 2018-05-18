@@ -1,6 +1,7 @@
 package command;
 
 import response.Response;
+import response.ResponseData;
 
 public class RegisterCommand implements Command {
 
@@ -34,5 +35,7 @@ public class RegisterCommand implements Command {
     public void setCode(String code) {
         this.code = code;
     }
+
+
 
 }

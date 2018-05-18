@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -29,7 +30,7 @@ public class InitAnswers extends BaseAdapter{
         this.context = context;
         this.questions = new ArrayList<>(questions);
         this.userResult = new ArrayList<>(userResult);
-        this.userAnswers = new ArrayList<>(userAnswers);
+        this.userAnswers = new ArrayList<>(userAnswers);//0: empty 1: A 2:B ...(correct answer also)
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -57,17 +58,22 @@ public class InitAnswers extends BaseAdapter{
 
         int option_i = 0;
         for(Button btn : buttons){
+            btn = (RadioButton) btn;
+            //((RadioButton) btn).setChecked(false);
             btn.setEnabled(false);
             btn.setTextColor(Color.WHITE);
             btn.setTag("result_"+option_i+"_"+position);
             btn.setText(questions.get(position).getAnsweri(option_i));
-            if(userAnswers.get(position)-1==option_i)
+            if(questions.get(position).getCorrectAnswer()-1==option_i)
+                btn.setTextColor(Color.GREEN);
+            if(userAnswers.get(position)-1==option_i){
+                ((RadioButton) btn).setChecked(true);
                 if(userResult.get(position))
                     btn.setTextColor(Color.GREEN);
                 else
                     btn.setTextColor(Color.RED);
-            if(questions.get(position).getCorrectAnswer()==option_i)
-                btn.setTextColor(Color.GREEN);
+
+            }
             option_i++;
         }
 
