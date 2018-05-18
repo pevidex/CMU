@@ -1,5 +1,7 @@
 package com.cmu.group22.hoponcmu;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -16,6 +18,9 @@ import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetQuestionsTask;
 import com.cmu.group22.hoponcmu.Task.SendAnswersTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
+
+import org.w3c.dom.Text;
 
 import classes.Answers;
 import classes.Question;
@@ -32,6 +37,9 @@ public class CurrentQuizActivity extends AppCompatActivity {
     int currentPos = 0;
     Answers ans;
 
+    int correctAnswers = 0;
+    long time;
+
     RadioGroup radioAnsGroup;
     ArrayList<Question> questions;
     ArrayList<Boolean> answersResults = null;
@@ -45,27 +53,63 @@ public class CurrentQuizActivity extends AppCompatActivity {
         globalContext = (GlobalContext) getApplicationContext();
         ans = globalContext.getAnswers();
 
-
-        setCurrentLocation(getIntent().getStringExtra("location"));
-        GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this, globalContext).execute(currentLocation);
-        try{
-            String temp = g.get();}
-        catch(Exception e){Log.d("DummyClient","ERROR on get questions task");}
-
-        TextView title = (TextView) findViewById (R.id.QuizTitle);
-        title.setText(currentLocation);
-
         radioAnsGroup = (RadioGroup) findViewById(R.id.radioAns);
         nextBtn = (Button) findViewById(R.id.Btn_sumbit);
         backBtn = (Button) findViewById(R.id.Btn_back);
-        ans.init(questions);
-        resetCurrentquiz();
+        TextView tvQuestion = (TextView) findViewById(R.id.question);
+
+        radioAnsGroup.setVisibility(View.INVISIBLE);
+        nextBtn.setVisibility(View.INVISIBLE);
+        backBtn.setVisibility(View.INVISIBLE);
+        tvQuestion.setVisibility(View.INVISIBLE);
+        TextView title = (TextView) findViewById (R.id.QuizTitle);
+
+        setCurrentLocation(getIntent().getStringExtra("location"));
+        Log.d("CurrentQuizz", "Current Location = " + currentLocation);
+        if(currentLocation.equals("") && globalContext.getQuizz().isEmpty()) {
+            //SET EVERYTHING TO INVISIBLE
+            radioAnsGroup.setVisibility(View.INVISIBLE);
+            nextBtn.setVisibility(View.INVISIBLE);
+            backBtn.setVisibility(View.INVISIBLE);
+
+            title.setText("TOO LATE TO DOWNLOAD QUIZZ");
+            Log.d("CurrentQuizz", "Too late to download");
+
+        }
+        else {
+            if(globalContext.getQuizz().isEmpty()) {
+
+                Log.d("CurrentQuizz", "Downloading from server");
+                GetQuestionsTask g = (GetQuestionsTask) new GetQuestionsTask(CurrentQuizActivity.this, globalContext).execute(currentLocation);
+                try {
+                    String temp = g.get();
+                } catch (Exception e) {
+                    Log.d("DummyClient", "ERROR on get questions task");
+                }
+            }
+            else
+                questions = globalContext.getQuizz();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(CurrentQuizActivity.this);
+            builder.setMessage("Questions Downloaded! Do you want to answer now?").setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener).show();
+
+            title.setText(currentLocation);
+
+            radioAnsGroup.setVisibility(View.VISIBLE);
+            nextBtn.setVisibility(View.VISIBLE);
+            backBtn.setVisibility(View.VISIBLE);
+            tvQuestion.setVisibility(View.VISIBLE);
+
+            ans.init(questions);
+            resetCurrentquiz();
 
 
-        nextBtn.setOnClickListener(onClickListener);
-        backBtn.setOnClickListener(onClickListener);
+            nextBtn.setOnClickListener(onClickListener);
+            backBtn.setOnClickListener(onClickListener);
 
 
+        }
     }
 
     private OnClickListener onClickListener = new OnClickListener(){
@@ -106,12 +150,37 @@ public class CurrentQuizActivity extends AppCompatActivity {
                         long endTime = SystemClock.elapsedRealtime();
 
                         ArrayList<Integer> answers = new ArrayList<>(ans.getAnswers());
-                        new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName(),globalContext).execute();
-                        ans.clear();
+
+                        long quizztime = SystemClock.elapsedRealtime() - globalContext.getStartTime(currentLocation);
+                        Log.d("CurrentQuizActivity", "TIME="+ quizztime/1000);
+                        WifiDirectService wservice;
+                        String myName;
+                        if(WifiDirectService.isRunning()) {
+                            wservice = WifiDirectService.getInstance();
+                            myName = globalContext.getUserName();
+                            String userNumber = myName.substring(4);
+                            if((Integer.parseInt(userNumber) % 2) == 0) {//FOREIGN USER
+                                String result = wservice.sendAnswersToNative(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName(), quizztime);
+                                Log.d("CurrentQuizActivity",result);
+                            } else {  //NATIVE USER
+                                SendAnswersTask s = (SendAnswersTask)  new SendAnswersTask(CurrentQuizActivity.this, answers, currentLocation, globalContext.getUserName(),globalContext, quizztime).execute();
+                                try{
+                                    String temp = s.get();}
+                                catch(Exception e){Log.d("CurrentQuizActivity","task error");}
+                            }
+                        }
+
+
+                         ans.clear();
+
                         //redirect to the answer result list
-                        Intent intent = new Intent(v.getContext(),QuizResultActivity.class);
+                        globalContext.setQuizz(new ArrayList<Question>());  //CLEAR QUESTIONS AFTER SUBMIT
+                        Intent intent = new Intent(v.getContext(),QuizSubmitActivity.class);
                         intent.putExtra("name_of_quiz",currentLocation);
+                        intent.putExtra("quizzTime", quizztime);
+                        intent.putExtra("correctAnswers", correctAnswers);
                         startActivity(intent);
+                        finish();
                         return;
                     }
                     break;
@@ -130,20 +199,21 @@ public class CurrentQuizActivity extends AppCompatActivity {
 
     public void updateQuestions(ArrayList<Question> questions){
         this.questions = questions;
+        globalContext.setQuizz(questions);
     }
 
     public void updateAnswers(ArrayList<Boolean> results){
-        Log.d("CurrentQuizzActivity: ", "Receiving update answers");
+        Log.d("CurrentQuizActivity: ", "Receiving update answers");
         this.answersResults = results;
 
-        int correctAnswers = 0;
+        correctAnswers = 0;
 
         for(Boolean b : answersResults){
-            Log.d("CurrentQuizz", "" +b);
+            Log.d("CurrentQuizActivity", "" +b);
             if(b) correctAnswers++;
         }
 
-        Log.d("CurrentQuiz", "Number of correct answers: " + correctAnswers);
+        Log.d("CurrentQuizActivity", "Number of correct answers: " + correctAnswers);
     }
 
     protected void resetCurrentquiz(){
@@ -204,5 +274,21 @@ public class CurrentQuizActivity extends AppCompatActivity {
     public void updateAnswersViews(){
         //TODO Edit necessary views to display correct answers
     }
+
+    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            switch (which){
+                case DialogInterface.BUTTON_POSITIVE:
+                    long time = SystemClock.elapsedRealtime();
+                    globalContext.setStartTime(currentLocation, time);
+                    break;
+
+                case DialogInterface.BUTTON_NEGATIVE:
+                    finish();
+                    break;
+            }
+        }
+    };
 
 }

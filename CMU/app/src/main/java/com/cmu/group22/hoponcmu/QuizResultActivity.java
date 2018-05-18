@@ -14,6 +14,7 @@ import java.util.List;
 import classes.Question;
 
 import com.cmu.group22.hoponcmu.Task.UserLocationHistoryTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 public class QuizResultActivity extends AppCompatActivity {
 
@@ -37,11 +38,14 @@ public class QuizResultActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if(bundle!=null){
             name_of_quiz = bundle.getString("name_of_quiz");
+            //TODO CHECK IF NAME OF QUIZ IS SET PROPERLY
         }else{
             return;
         }
+
         currentLocation = name_of_quiz;
         UserLocationHistoryTask u = (UserLocationHistoryTask) new UserLocationHistoryTask(QuizResultActivity.this, globalContext).execute(globalContext.getUserName(),name_of_quiz);
+
         try{
             String temp = u.get();}
         catch(Exception e){Log.d("QuizResultActivity","task error");}

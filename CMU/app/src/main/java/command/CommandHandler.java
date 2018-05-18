@@ -13,6 +13,7 @@ public interface CommandHandler {
     public Response handle(AnswersCommand c);
     public Response handle(UserHistoryCommand c);
     public Response handle(UserLocationHistoryCommand c);
-
     public Response handle(Request request);
+
+    public Response handle(ShareCommand c);
 }

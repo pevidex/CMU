@@ -44,6 +44,8 @@ public class RegisterTask extends Tasks {
         Request request = null;
 
         byte[] serverSignPbkBytes = getServerPbk("serverkey/signpbk");//used for sign
+        context.setServerSigKey(serverSignPbkBytes);
+        Log.d("debugtask","server key store");
         PublicKey signPbk = null;
         PrivateKey signPrk = null;
         //get key
@@ -58,6 +60,7 @@ public class RegisterTask extends Tasks {
         } catch (IOException|InvalidAlgorithmParameterException|NoSuchPaddingException|NoSuchAlgorithmException|InvalidKeyException|IllegalBlockSizeException|BadPaddingException e) {
             Log.d("requesterror",e.getMessage());
         }
+        Log.d("debugtask","start to connect server");
 
         //send the request and deal with
         try {

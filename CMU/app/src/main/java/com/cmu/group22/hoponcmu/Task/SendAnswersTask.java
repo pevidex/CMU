@@ -41,13 +41,16 @@ public class SendAnswersTask extends Tasks {
     ArrayList<Integer> answers;
     String location;
     String userName;
+    long quizzTime;
 
-    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l, String userName, GlobalContext c) {
+    public SendAnswersTask(CurrentQuizActivity currentQuizActivity, ArrayList<Integer> a, String l, String userName, GlobalContext c, long qt) {
         super(c);
+
         this.currentQuizActivity = currentQuizActivity;
         this.answers = a;
         this.location = l;
         this.userName= userName;
+        this.quizzTime = qt;
     }
 
 
@@ -67,12 +70,13 @@ public class SendAnswersTask extends Tasks {
         Log.d("SendAnswersTask", "Answer's Size: " + answers.size());
 
         try {
-            Commands lc = new AnswersCommand(location, answers,userName);
+            Commands lc = new AnswersCommand(location, answers,userName, quizzTime);
             request = wrapRequest(lc, signPbk, signPrk);
         }catch (IOException | InvalidAlgorithmParameterException | NoSuchPaddingException | NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException
                 e) {
             Log.d("requesterror",e.getMessage());
         }
+
 
 
         try {

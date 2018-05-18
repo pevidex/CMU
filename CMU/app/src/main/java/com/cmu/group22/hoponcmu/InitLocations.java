@@ -41,9 +41,9 @@ public class InitLocations extends BaseAdapter {
 
 
         TextView textView = (TextView) listView.findViewById(R.id.grid_locations_label);
-        textView.setText(locations.get(position).getName());
-//        ImageView imageView = (ImageView) listView.findViewById(R.id.grid_locations_image);
 
+        if(locations.get(position)!=null)
+            textView.setText(locations.get(position).getName());
 
         //int imageId = context.getResources().getIdentifier(locationItems[position][1], null, context.getPackageName());
         //imageView.setImageResource(imageId);

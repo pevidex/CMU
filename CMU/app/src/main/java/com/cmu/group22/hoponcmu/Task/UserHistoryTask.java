@@ -65,7 +65,6 @@ public class UserHistoryTask extends Tasks {
             Log.d("requesterror",e.getMessage());
         }
 
-
         try {
             server = new Socket("10.0.2.2", 9090);
             ObjectOutputStream oos = new ObjectOutputStream(server.getOutputStream());
@@ -86,7 +85,6 @@ public class UserHistoryTask extends Tasks {
                 ois.close();
                 Log.d("UserHistoryTask", "Hi there!!");
             }
-
 
         }
         catch (Exception e) {

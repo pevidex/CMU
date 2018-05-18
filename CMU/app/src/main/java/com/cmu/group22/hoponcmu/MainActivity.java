@@ -2,6 +2,7 @@ package com.cmu.group22.hoponcmu;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.cmu.group22.hoponcmu.Task.GetLocationsTask;
+import com.cmu.group22.hoponcmu.WifiDirect.WifiDirectService;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -22,6 +24,7 @@ import java.security.Security;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Map;
 
 import classes.Location;
 import command.RegisterCommand;
@@ -53,48 +56,7 @@ public class MainActivity extends AppCompatActivity {
         //Intent intent = new Intent(this, LoginActivity.class);
         //startActivity(intent);
 
-        //debug
-        // List all security providers
-        for (Provider p : Security.getProviders()) {
-            Log.d("provider", String.format("== %s ==", p.getName()));
-            for (Provider.Service s : p.getServices()) {
-                Log.d("provider", String.format("- %s", s.getAlgorithm()));
-            }
-        }
-//        try {
-//            SignKeypair  signKeypair = new SignKeypair();
-//            RegisterCommand lc = new RegisterCommand("code","name", signKeypair.getSignPbkBytes());
-//            SignedObject lc_signed= new SignedObject(lc, signKeypair);
-//            RegisterCommand deser_lc = (RegisterCommand) lc_signed.getObject();
-//            Log.d("debug",deser_lc.getUsername());
-//
-//            if(lc_signed.verify(deser_lc.getPubkey()))
-//                Log.d("debug","success");
-//
-//            //SecretKey sk = globalContext.getSecretKey();
-//            //EncryptedObject pack = new EncryptedObject(lc_signed, sk);
-//            //Log.d("debug2",((RegisterCommand) pack.decrypt(sk).getObject()).getUsername());
-//
-//
-//        } catch (NoSuchProviderException e) {
-//            Log.d("errorx",e.getMessage());
-//        } catch (IOException e) {
-//            Log.d("errorx",e.getMessage());
-//        } catch (ClassNotFoundException e) {
-//            Log.d("errorx",e.getMessage());
-//        } catch (NoSuchAlgorithmException e) {
-//            e.printStackTrace();
-//            Log.d("errorx",e.getMessage());
-//        } catch (SignatureException e) {
-//            Log.d("errorx",e.getMessage());
-//            e.printStackTrace();
-//        } catch (InvalidKeyException e) {
-//            Log.d("errorx",e.getMessage());
-//            e.printStackTrace();
-//        } catch (InvalidKeySpecException e) {
-//            Log.d("errorx",e.getMessage());
-//            e.printStackTrace();
-//        }
+
         //init the click actions about logout, current_quiz, my quiz, my message box
         btLogout = (Button) findViewById(R.id.Btn_logout);
         img_currentquiz = (ImageView) findViewById(R.id.imageView_currentquiz);
@@ -109,9 +71,9 @@ public class MainActivity extends AppCompatActivity {
                 globalContext.setSessionId(CLEAR_SESSION);
                 Intent intent = new Intent(v.getContext(), LoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
-
         //Get Locations From Server
         new GetLocationsTask(MainActivity.this, globalContext).execute();
 
@@ -122,7 +84,11 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent intent = new Intent(v.getContext(), CurrentQuizActivity.class);
 
-                intent.putExtra("location","belem tower");//need to know which location we're at
+
+                //CHECK IF DEVICE DETECTS WIFI MONUMENT
+                String currentLocation = getCurrentLocation();
+
+                intent.putExtra("location", currentLocation);//need to know which location we're at
 
                 startActivity(intent);
             }
@@ -138,13 +104,18 @@ public class MainActivity extends AppCompatActivity {
         img_msgbox.setClickable(true);
         img_msgbox.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), LoginActivity.class);//TODO:change me
+                Intent intent = new Intent(v.getContext(), RankingActivity.class);
                 startActivity(intent);
             }
         });
 
         //TODO: maybe there should be some click actions on locations?
 
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        //TODO
     }
     public void updateLocations(ArrayList<Location> locations){
         this.locations=locations;
@@ -155,5 +126,17 @@ public class MainActivity extends AppCompatActivity {
     public void updateInterface(String reply) {
         Toast.makeText(MainActivity.this, reply,
                 Toast.LENGTH_LONG).show();
+    }
+
+
+    public String getCurrentLocation(){
+        String currentLocation = "";
+        WifiDirectService wifiService;
+        if(WifiDirectService.isRunning()) {
+            wifiService = WifiDirectService.getInstance();
+            currentLocation = wifiService.getMonumentId();
+
+        }
+        return currentLocation;
     }
 }
